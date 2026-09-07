@@ -1,0 +1,111 @@
+generated: '2026-09-07'
+method: searched
+source: https://advance.ai/security-compliance/
+docs: https://advance.ai/security-compliance/
+summary: >-
+  ADVANCE.AI's contract declares no industry standard. The Open API is a vendor-shaped RPC surface
+  with a proprietary envelope, a proprietary signed-key auth scheme and no reference to any
+  interoperability specification. The compliance posture that does exist is published as
+  certificate BADGE IMAGES on the Security & Compliance page rather than as text, so the
+  certificate numbers, scopes and validity dates are not machine-readable and are not asserted
+  here. What is machine-readable is the security contact.
+entries:
+- id: oauth2
+  conforms: false
+  evidence: >-
+    openapi/advanceai-openapi.yml declares one securityScheme of type apiKey. No OAuth 2.0 flow,
+    authorization endpoint or token endpoint in the OAuth sense is documented. The
+    generate-token operation is a proprietary signed key exchange, not an OAuth grant.
+- id: oidc
+  conforms: false
+  evidence: '/.well-known/openid-configuration returns HTTP 404 on advance.ai, api.advance.ai and doc.advance.ai (probed 2026-09-07).'
+- id: rfc9457
+  conforms: false
+  evidence: >-
+    No application/problem+json response is documented on any operation. Errors are carried in a
+    proprietary 200-status envelope keyed on `code`. See errors/advanceai-error-codes.yml.
+- id: rfc8594
+  conforms: false
+  evidence: No Deprecation or Sunset response header is documented. See lifecycle/advanceai-lifecycle.yml.
+- id: rfc9116
+  conforms: false
+  evidence: '/.well-known/security.txt returns HTTP 404 on every ADVANCE.AI host probed 2026-09-07. A security contact IS published, but in HTML prose on the Security & Compliance page rather than in the RFC 9116 file.'
+- id: idempotency
+  conforms: false
+  evidence: No Idempotency-Key header or replay-protection mechanism is documented. See conventions/advanceai-conventions.yml.
+- id: pagination
+  conforms: false
+  evidence: No list or collection operation exists in the documented surface.
+- id: rate-limit-headers
+  conforms: partial
+  evidence: >-
+    Retry-After is returned on SERVICE_BUSY and RETRY_LATER, which is standard. Neither the RFC 9238
+    RateLimit-* family nor the de-facto X-RateLimit-* family is returned, so remaining budget is
+    invisible until exhaustion. See rate-limits/advanceai-rate-limits.yml.
+- id: openapi
+  conforms: false
+  evidence: >-
+    ADVANCE.AI publishes no OpenAPI. /openapi.json, /openapi.yaml, /swagger.json, /v1/openapi.json,
+    /api-docs, /docs and /redoc all returned HTTP 404 on api.advance.ai and 404 on doc.advance.ai
+    (probed 2026-09-07). The spec in this repo was authored by API Evangelist from the published
+    documentation and is marked as such.
+domain_standards:
+  applicable_market: digital identity verification / biometric presentation attack detection / eKYC
+  declared_in_contract: false
+  note: >-
+    REWARD-ONLY CHECK, NOT CLAIMED. The contract declares no domain standard. This market does have
+    candidate standards an identity vendor could speak — ISO/IEC 30107-3 for presentation attack
+    detection, ISO/IEC 19794 / 39794 for biometric data interchange, NIST SP 800-63 for identity
+    assurance levels, and OpenID for Identity Assurance. ADVANCE.AI's public reference names none of
+    them, and neither its request nor its response schemas carry a standard identifier, URN or
+    profile. An integrator who already speaks any of these will still need a bespoke connector.
+  candidates_checked:
+  - {standard: 'ISO/IEC 30107-3 (PAD)', declared: false, note: 'Implied by the iBeta Level 1 and Level 2 badges below — iBeta PAD testing is conducted to this standard — but ADVANCE.AI does not name it in text and the API returns no PAD conformance level.'}
+  - {standard: 'ISO/IEC 19794 / 39794 (biometric interchange)', declared: false}
+  - {standard: 'NIST SP 800-63', declared: false}
+  - {standard: 'OpenID for Identity Assurance', declared: false}
+  - {standard: 'W3C Verifiable Credentials', declared: false}
+certifications:
+  published_as: certificate badge images on https://advance.ai/security-compliance/
+  machine_readable: false
+  caveat: >-
+    Each item below is published as a .webp certificate image with no accompanying text. The
+    certificate number, issuing scope, covered entity and expiry date are not published in a form
+    any machine can read, and were not read from the images. Presence of the badge is the finding;
+    the scope of the certification is NOT asserted.
+  items:
+  - name: BSI certificate
+    asset: https://advance.ai/wp-content/uploads/2025/08/bsi-certificate.webp
+    permalink: https://advance.ai/homepage/bsi-certificate/
+    standard_named_in_text: false
+    note: BSI is an accredited certification body. The specific standard certified is not stated in text on the page.
+  - name: iBeta Level 1
+    asset: https://advance.ai/wp-content/uploads/2025/08/iBeta-Level1cert.webp
+    permalink: https://advance.ai/homepage/ibeta-level1cert/
+    standard_named_in_text: false
+    relates_to: Presentation Attack Detection testing for the liveness product.
+  - name: iBeta Level 2
+    asset: https://advance.ai/wp-content/uploads/2025/08/iBeta-Level2cert.webp
+    permalink: https://advance.ai/homepage/ibeta-level2cert/
+    standard_named_in_text: false
+    relates_to: Presentation Attack Detection testing for the liveness product.
+  not_claimed:
+  - standard: ISO 27001
+    reason: >-
+      Named on the page only as a generic example of a regulatory standard ("Regulatory standards
+      like PCI DSS, HIPAA, and ISO 27001 prescribe recommendations..."), not as a certification
+      ADVANCE.AI holds. Not credited.
+  - standard: PCI DSS
+    reason: Same sentence. Named as an example, not claimed. Not credited.
+  - standard: HIPAA
+    reason: Same sentence. Named as an example, not claimed. Not credited.
+  - standard: SOC 2
+    reason: Not mentioned anywhere on the public site.
+privacy:
+  privacy_policy: https://advance.ai/privacy-policy/
+  privacy_notice: https://advance.ai/privacy-notice/
+  terms: https://advance.ai/terms-of-service/
+  data_deletion_api: >-
+    clearLivenessPiiData (GET /liveness/ext/v1/clear-data) is offered explicitly "if there are
+    compliance requirements ... to clean up PII data". A programmatic erasure endpoint is a genuine
+    and uncommon privacy affordance in this category.

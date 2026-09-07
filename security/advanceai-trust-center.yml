@@ -1,0 +1,33 @@
+generated: '2026-09-07'
+method: searched
+source: https://advance.ai/security-compliance/
+url: https://advance.ai/security-compliance/
+http_status: 200
+fetched: '2026-09-07'
+platform: first-party page
+summary: >-
+  ADVANCE.AI's Security & Compliance page is a first-party trust page, not a hosted trust centre.
+  It publishes a security contact, describes the security programme, and displays three
+  certification badges as images. It does not offer document request, NDA-gated artefact download,
+  subprocessor list, or a live compliance dashboard, and it names no certificate numbers or
+  audit periods in text.
+certifications_displayed:
+- {name: BSI certificate, form: badge image, standard_named_in_text: false}
+- {name: iBeta Level 1, form: badge image, standard_named_in_text: false}
+- {name: iBeta Level 2, form: badge image, standard_named_in_text: false}
+certification_caveat: >-
+  Badge images only. No certificate number, scope statement, covered entity, issue date or expiry
+  is published in machine-readable text. This profile records that the badges are displayed; it
+  does not assert the scope or currency of any certification. See conformance/advanceai-conformance.yml.
+not_published:
+- SOC 2 report or bridge letter
+- Subprocessor list
+- Data residency statement
+- Penetration test summary
+- Document request / NDA workflow
+- Named certificate numbers or audit periods
+related_documents:
+- {name: Privacy Policy, url: 'https://advance.ai/privacy-policy/'}
+- {name: Privacy Notice, url: 'https://advance.ai/privacy-notice/'}
+- {name: Terms of Service, url: 'https://advance.ai/terms-of-service/'}
+security_contact: security@advance.ai

@@ -1,0 +1,101 @@
+generated: '2026-09-07'
+method: derived
+source: openapi/advanceai-openapi.yml
+summary: >-
+  ADVANCE.AI's Open API has almost no persistent entity model. It is a session-and-artefact API:
+  short-lived credentials (token, license, signatureId) authorise a mobile capture, and the capture
+  produces a result addressed by an opaque identifier that expires. There are no customer, account,
+  case or applicant resources to read, no collection endpoints, and no relationships expressed by
+  $ref between business objects — every operation returns a leaf payload inside the shared envelope.
+entities:
+- name: Envelope
+  role: response wrapper
+  schema: '#/components/schemas/Envelope'
+  fields: [code, message, data, extra, transactionId, pricingStrategy]
+  note: Wraps every response on every operation. Not a business entity.
+- name: AccessToken
+  schema: '#/components/schemas/TokenData'
+  id_field: token
+  id_form: JWT
+  lifetime: 60-86400 seconds, default 3600
+  created_by: generateAccessToken
+  fields: [token, expiredTime]
+  scope: Valid across every ADVANCE.AI Open API. Multiple concurrent tokens may exist.
+- name: SdkLicense
+  schema: '#/components/schemas/LicenseData'
+  id_field: license
+  id_form: opaque base64-like string
+  lifetime: 1-86400 seconds, default 600
+  created_by: [authorizeDocumentVerificationLicense, authorizeLivenessLicense]
+  fields: [license, expireTimestamp]
+  scope: Optionally bound to a list of applicationId values.
+  note: Cannot be revoked. Expiry is the only exit.
+- name: LivenessSignature
+  id_field: signatureId
+  id_form: opaque string
+  created_by: generateLivenessSignatureId
+  cardinality: single-use
+  note: A new one is required after each completed detection.
+- name: DocumentVerification
+  id_field: IDVID
+  id_form: UUID (documented example ba959a16-a06c-4b82-ae1f-22452b5bbcf3)
+  created_by: the mobile SDK, not the HTTP API
+  read_by: queryDocumentVerificationResult
+  schema: '#/components/schemas/DocumentVerificationResult'
+  fields: [image, OCR, idForgery]
+  note: The identifier is minted OUTSIDE this API. Nothing in the HTTP surface creates an IDVID.
+- name: OcrFields
+  schema: '#/components/schemas/OcrFields'
+  parent: DocumentVerification
+  note: >-
+    Field set is document-type dependent. The documented example is an Indonesian KTP, whose
+    fields (NIK-style idNumber, rtrw, religion, bloodType) do not generalise to other countries.
+    `others` is an open map, which is where per-country variation is carried.
+- name: IdForgery
+  parent: DocumentVerification
+  fields: [result, data, detail]
+  values: {result: [pass, fail]}
+  fail_reasons: [Retake/Screenshot, Colourful photocopy or cut-off corner, Black and white photocopy, Pasted face, Modified NIK]
+- name: LivenessDetection
+  id_field: livenessId
+  id_form: UUID-like (documented example ddsd-9e6-dcc9-4ca1-bdfe-9f001c05f1b1)
+  created_by: the mobile SDK, not the HTTP API
+  read_by: [getLivenessDetectionResult, getLivenessVideo]
+  deleted_by: clearLivenessPiiData
+  schema: '#/components/schemas/LivenessResult'
+  fields: [detectionResult, livenessScore, auditImageUrl, imageFarUrl, farImageTime, imageNearUrl, nearImageTime, attackType, attackSubType, sdkVersion, platform]
+  note: The billing tag. ADVANCE.AI states a successfully generated livenessId is what is billed.
+- name: FaceComparison
+  schema: '#/components/schemas/FaceComparisonResult'
+  id_field: none
+  created_by: compareFaces
+  fields: [similarity, firstFace, secondFace]
+  note: Stateless. No identifier is returned and no result is retrievable afterwards — the only handle is the transactionId.
+- name: FacePosition
+  schema: '#/components/schemas/FacePosition'
+  parent: FaceComparison
+  fields: [id, left, top, right, bottom, gender]
+relationships:
+- {from: LivenessSignature, to: LivenessDetection, type: has_one, via: signatureId, note: 'A signature authorises one capture, which becomes one detection.'}
+- {from: LivenessDetection, to: LivenessVideo, type: has_one, via: livenessId, note: 'Only when video recording is enabled on the account.'}
+- {from: SdkLicense, to: DocumentVerification, type: has_many, via: license, note: 'One license may cover multiple captures within its effective period.'}
+- {from: SdkLicense, to: LivenessDetection, type: has_many, via: license}
+- {from: DocumentVerification, to: OcrFields, type: has_one, via: data.OCR}
+- {from: DocumentVerification, to: IdForgery, type: has_one, via: data.idForgery}
+- {from: FaceComparison, to: FacePosition, type: has_many, via: 'data.firstFace / data.secondFace'}
+identifier_conventions:
+  transactionId: Present on EVERY response, max 64 characters, hex-like. The universal support handle. Not a resource id.
+  IDVID: Uppercase acronym field name, UUID valued. The only field in the API not in camelCase.
+  livenessId / signatureId: camelCase, opaque, minted by the SDK or the signature endpoint.
+  note: There are no typed id prefixes (no `cus_`-style scheme), so an identifier carries no information about what it addresses.
+ephemerality:
+  note: >-
+    The defining property of this data model is that almost nothing is durable. Every image and
+    video URL expires in 24 hours. Tokens and licenses expire in seconds to a day. signatureId is
+    single-use. There is no list endpoint, so a result you did not store the identifier for is
+    unreachable. Anything an integrator needs to keep, the integrator must copy out.
+gaps:
+- No customer, account, applicant or case entity is exposed.
+- No collection or search operation, so nothing can be enumerated.
+- No webhook or event, so a result must be polled by an identifier obtained from the SDK.
+- No cross-service linking: a document verification and a liveness detection for the same person share no identifier.

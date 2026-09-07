@@ -1,0 +1,172 @@
+generated: '2026-09-07'
+method: generated+corrected
+source: openapi/advanceai-openapi.yml
+description: Recommended x-agentic-access execution contracts, classified heuristically from the OpenAPI.
+  A governance starting point for exposing this API to AI agents — review and bind audience per deployment.
+  See research/curity/agentic-governance/.
+summary:
+  operations: 9
+  by_action_class:
+    acting: 8
+    connected: 1
+  by_consequence:
+    write: 7
+    read: 1
+    destructive: 1
+  human_in_the_loop_required: 1
+operations:
+- path: /openapi/auth/ticket/v1/generate-token
+  method: post
+  operationId: generateAccessToken
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /intl/openapi/face-identity/document-verification/v1/auth-license
+  method: post
+  operationId: authorizeDocumentVerificationLicense
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /intl/openapi/face-identity/document-verification/v1/query
+  method: post
+  operationId: queryDocumentVerificationResult
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /openapi/face-recognition/v4/check
+  method: post
+  operationId: compareFaces
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /liveness/ext/v1/generate-signature-id
+  method: post
+  operationId: generateLivenessSignatureId
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /openapi/liveness/v1/auth-license
+  method: post
+  operationId: authorizeLivenessLicense
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /openapi/liveness/v3/detection-result
+  method: post
+  operationId: getLivenessDetectionResult
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /liveness/ext/v1/get-video
+  method: get
+  operationId: getLivenessVideo
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    token:
+      max-ttl: 900
+    audit: required
+    data-sensitivity: biometric
+    note: Returns a link to biometric video of an identified person. Reads of this class should be audited.
+- path: /liveness/ext/v1/clear-data
+  method: get
+  operationId: clearLivenessPiiData
+  x-agentic-access:
+    action-class: acting
+    consequence: destructive
+    reversible: false
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - always
+      reason: Irreversible. ADVANCE.AI documents no restore, no soft delete and no recovery window.
+    audit: required
+    note: Implemented as GET but deletes data. See conventions/advanceai-conventions.yml reversibility.
+x-manual-correction:
+  date: '2026-09-07'
+  by: API Evangelist enrichment pass
+  reason: The heuristic classifies by HTTP method, and ADVANCE.AI implements two consequential operations
+    as GET. clearLivenessPiiData permanently deletes the PII held for a liveness detection and was auto-classified
+    consequence:read / audit:none / no escalation — the most dangerous possible misreading, since it would
+    tell an agent an irreversible deletion is a safe read. getLivenessVideo returns biometric video and
+    was likewise classified as an unaudited read. Both entries below were corrected by hand from https://doc.advance.ai/liveness_detection.html.
+  corrected_operations:
+  - clearLivenessPiiData
+  - getLivenessVideo
+  caveat: A GET that mutates is invisible to method-based classification. Any other provider in this catalog
+    that deletes over GET carries the same silent defect.

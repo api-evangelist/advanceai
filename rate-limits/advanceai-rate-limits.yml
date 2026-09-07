@@ -1,0 +1,68 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/liveness_detection.html
+docs: https://doc.advance.ai/liveness_detection.html
+summary: >-
+  ADVANCE.AI documents rate limiting and quota behaviour but publishes no numbers. The Glossary
+  describes the signals an over-limit response carries — an envelope code plus a Retry-After HTTP
+  header — without stating any request-per-second, per-minute or daily figure, and without naming
+  the scope the limit applies to. Limits are account-specific and negotiated with a sales manager,
+  so an integrator cannot size a client from the public documentation.
+limit_count: 0
+limits: []
+signals:
+  headers:
+  - name: Retry-After
+    returned_on: [SERVICE_BUSY, RETRY_LATER]
+    documented_example: 'Retry-After: 10s'
+    note: >-
+      Returned as an HTTP header on a 200 response whose envelope code is SERVICE_BUSY or
+      RETRY_LATER. This is the only runtime rate-limit signal ADVANCE.AI publishes.
+  - name: X-RateLimit-*
+    present: false
+  - name: RateLimit-*
+    present: false
+  status_code_on_exhaustion: 200
+  status_code_note: >-
+    Exhaustion is signalled in the envelope, not the HTTP status. ADVANCE.AI states SERVICE_BUSY
+    "may migrate to HTTP 429 Too Many Requests in the future" — a client should handle 429 today as
+    well, but must not rely on it.
+  envelope_codes:
+  - code: SERVICE_BUSY
+    billed: false
+    meaning: 'Rate limit is exceeded, please retry after the suggested time in HTTP Header.'
+    also_used_for: 'Quota exceeded: You have exceeded the daily quota for free queries.'
+    action: Honour Retry-After, then back off exponentially.
+  - code: RETRY_LATER
+    billed: false
+    meaning: Query failed, please retry after the suggested time in HTTP Header.
+    action: Honour Retry-After.
+  - code: OVER_QUERY_LIMIT
+    billed: false
+    meaning: >-
+      Free query quota exhausted, for a production account or for a test account. Distinct from
+      SERVICE_BUSY — this is an entitlement ceiling, not a throughput limit.
+    action: Not retryable. Contact the ADVANCE.AI sales manager for a paid allocation.
+  - code: INSUFFICIENT_BALANCE
+    billed: false
+    meaning: Prepaid balance exhausted.
+    action: Not retryable. Top up.
+quotas:
+  free_daily_quota:
+    exists: true
+    value: null
+    note: >-
+      A "daily quota for free queries" is named in the SERVICE_BUSY description and a separate free
+      query quota is named in OVER_QUERY_LIMIT, including a distinct test-account allocation. No
+      figure is published for any of them.
+scope:
+  documented: false
+  note: >-
+    Whether limits apply per access key, per account, per endpoint or per country is not stated.
+    IAM_FAILED shows entitlement is scoped per country and per calling domain, which suggests
+    limits are account-scoped, but ADVANCE.AI does not say so.
+gaps:
+- No published numeric limit for any operation.
+- No X-RateLimit-* or RFC 9238 RateLimit-* headers, so a client cannot see remaining budget before exhausting it.
+- No published quota figure for the free tier or the test account.
+- Retry-After is documented in prose with one example value; its exact format (seconds vs HTTP-date) is not specified.

@@ -1,0 +1,103 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/liveness_detection.html
+docs:
+- https://doc.advance.ai/liveness_detection.html
+- https://doc.advance.ai/sdk/android/global-iqc/en/standard.html
+summary: >-
+  ADVANCE.AI runs a public incident.io status page and publishes an explicit SDK version-support
+  ladder that names which versions still receive updates. It does not publish an API versioning
+  policy, an RFC 8594 Deprecation/Sunset header contract, an SLA, or a dated changelog. The
+  deprecation signal that does exist is real but narrow: it governs the mobile SDKs and one
+  response field, not the HTTP API versions.
+status_page:
+  url: https://status.advance.ai/
+  platform: incident.io
+  verified: probed
+  http_status: 200
+  fetched: '2026-09-07'
+  components: >-
+    Two component groups, CV and ICS, six components each. At fetch time two incidents were open —
+    "Elevated error rates in liveness-detection" (investigating, ongoing 22 hours) and "Elevated
+    error rates in curp-info-check" (investigating, ongoing 5 days).
+  subscribe: true
+  history: Calendar view of incident history is published.
+  note: >-
+    A legacy Atlassian Statuspage also answers at https://advanceai.statuspage.io/ titled "ADVANCE
+    AI Status" (HTTP 200, fetched 2026-09-07). status.advance.ai is the current canonical surface.
+  incidental_finding: >-
+    The status page names a component "curp-info-check" that has no corresponding page in the
+    public API reference. CURP is the Mexican national identity number, so ADVANCE.AI operates at
+    least one production API — and likely a family of country-specific identity-check endpoints —
+    that the public documentation does not describe. The published reference is a subset of the
+    running surface.
+versioning:
+  policy_published: false
+  style: path segment, per service, unsynchronised
+  current_versions:
+    authentication: v1
+    document_verification: v1
+    face_recognition: v4
+    liveness_license: v1
+    liveness_detection_result: v3
+    liveness_ext: v1
+  note: >-
+    Each service carries its own path version and they do not move together. No policy states how
+    long a previous path version stays callable, whether older versions are still served, or how a
+    breaking change is announced. There is no version header and no version negotiation.
+deprecation:
+  policy_published: false
+  rfc8594_headers: false
+  sunset_header: false
+  deprecation_header: false
+  signals_published: true
+  note: >-
+    ADVANCE.AI publishes deprecation as a support-status TABLE on the SDK, not as a header contract
+    or a written policy. It is a genuine, dated, provider-authored statement of what is no longer
+    maintained — but it covers the mobile SDK line and one response field, and says nothing about
+    the HTTP API path versions. Read it as a maintenance ladder, not an API deprecation policy.
+  deprecated_items:
+  - item: Liveness Detection Native App SDK v3.x.x
+    status: No Further Updates
+    replacement: v4.x.x
+    sunset_date: null
+    source: https://doc.advance.ai/liveness_detection.html
+  - item: Liveness Detection Native App SDK v2.x.x
+    status: No Further Updates
+    replacement: v4.x.x
+    sunset_date: null
+    source: https://doc.advance.ai/liveness_detection.html
+  - item: Liveness Detection Native App SDK v1.x.x
+    status: No Further Updates
+    replacement: v4.x.x
+    sunset_date: null
+    source: https://doc.advance.ai/liveness_detection.html
+  - item: pricingStrategy response field on getLivenessVideo
+    status: Deprecated
+    detail: ADVANCE.AI marks it "Deprecated, Always return FREE" on this operation only.
+    sunset_date: null
+    source: https://doc.advance.ai/liveness_detection.html
+  maintained_items:
+  - item: Liveness Detection Native App SDK v4.x.x
+    status: Active (Maintained)
+    capabilities: [Face Capture, Liveness Detection, Device Security Detection, Deepfake Detection, Risk Control Strategy]
+    detection_methods: [SILENT, ACTION, DISTANT_NEAR, DISTANT_NEAR_ACTION]
+  deprecated_operations_in_spec: []
+sla:
+  published: false
+  note: No uptime commitment, latency target or support-response SLA is published on the public site or in the docs.
+changelog:
+  dated_changelog: false
+  note: >-
+    Per-SDK "Release Notes" and "Version logs" links exist inside the integration guides, but they
+    are in-page expanders on the SDK pages rather than a dated, addressable API changelog. No
+    standalone changelog URL was found. The Maven metadata for the Android Global IQA SDK is the
+    most reliable release-currency signal — see packages/advanceai-packages.yml.
+support:
+  url: https://support.advance.ai/hc/en-us
+  platform: Zendesk
+  probe_note: >-
+    Returns HTTP 403 with a Cloudflare "Just a moment..." interstitial to non-browser clients
+    (probed 2026-09-07 with a desktop Chrome User-Agent). The help centre demonstrably exists; this
+    is an ordinary bot challenge, not a dead pointer.
+  security_contact: security@advance.ai

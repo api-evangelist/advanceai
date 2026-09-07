@@ -1,0 +1,44 @@
+generated: '2026-09-07'
+method: generated
+source: openapi/advanceai-openapi.yml
+api: ADVANCE.AI Open API
+summary: >-
+  Four packaged Agent Skills covering the ADVANCE.AI Open API. Every operationId referenced is
+  present in openapi/advanceai-openapi.yml and traces to a documented endpoint on doc.advance.ai.
+  ADVANCE.AI publishes no skills, no AGENTS.md and no llms.txt of its own — these were authored by
+  API Evangelist.
+provider_published_skills: false
+skills:
+- name: advanceai-authenticate
+  file: advanceai-authenticate.md
+  description: Obtain and cache an access token and use it correctly on every other call.
+  operations: [generateAccessToken]
+  prerequisite_for: all
+- name: advanceai-face-comparison
+  file: advanceai-face-comparison.md
+  description: Compare two face photographs and act on the similarity score without billing avoidable failures.
+  operations: [generateAccessToken, compareFaces]
+  note: The only ADVANCE.AI flow that completes entirely over HTTP.
+- name: advanceai-document-verification
+  file: advanceai-document-verification.md
+  description: Run Global Document Verification and read the OCR extraction and ID forgery verdict.
+  operations: [generateAccessToken, authorizeDocumentVerificationLicense, queryDocumentVerificationResult]
+  requires_human_step: true
+- name: advanceai-liveness-detection
+  file: advanceai-liveness-detection.md
+  description: Run the full liveness flow including video evidence and irreversible PII deletion.
+  operations: [generateAccessToken, generateLivenessSignatureId, authorizeLivenessLicense, getLivenessDetectionResult, getLivenessVideo, clearLivenessPiiData]
+  requires_human_step: true
+  contains_irreversible_operation: true
+coverage:
+  operations_in_spec: 9
+  operations_covered: 9
+  uncovered: []
+cross_cutting_rules_embedded:
+- HTTP status is always 200; branch on the envelope `code`.
+- Never branch on `message` — ADVANCE.AI states it changes without notice.
+- Four face-comparison failure codes are chargeable; do not retry them.
+- Every returned image and video URL expires in 24 hours.
+- No idempotency mechanism exists; treat every write as at-most-once.
+- clearLivenessPiiData is irreversible with no documented recovery window.
+- Two of three flows require a mobile SDK capture and cannot be completed autonomously.

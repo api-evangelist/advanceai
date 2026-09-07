@@ -1,23 +1,152 @@
 aid: advanceai
-name: Advanceai
-description: 'Advanceai is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+name: ADVANCE.AI
+description: >-
+  ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+  business unit of Advance Intelligence Group, headquartered in Singapore and founded in 2016. Its
+  AdvanGuard product line covers identity verification, document verification, face authentication
+  and Know Your Business checks for banking and financial services, fintech, crypto, payments,
+  e-commerce and the sharing economy, with a strong footprint across Southeast Asia and other
+  emerging markets. ADVANCE.AI publishes a public Open API at api.advance.ai documented at
+  doc.advance.ai — token authentication, Global Document Verification with OCR field extraction and
+  ID forgery detection, face comparison, and liveness detection with video evidence and PII data
+  retention — plus first-party Android and iOS capture SDKs distributed from its own Maven and
+  object-storage endpoints. Onboarding is sales-led: there is no self-service sign-up and no
+  published pricing, and platform access keys are issued through the Websaas platform.
 url: https://raw.githubusercontent.com/api-evangelist/advanceai/refs/heads/main/apis.yml
+image: https://advance.ai/wp-content/uploads/2025/09/top-header-right-image.webp
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enriched-from-public-docs
+x-parent-company: advance-intelligence-group
+x-duplicate-candidates:
+- advance-intelligence-group
+- advance.ai
 specificationVersion: '0.20'
 created: '2026-09-07'
 modified: '2026-09-07'
+position: Producing
 tags:
 - Company
-apis: []
+- Identity Verification
+- KYC
+- KYB
+- AML
+- Fraud Prevention
+- Face Recognition
+- Liveness Detection
+- OCR
+- Document Verification
+- Risk Management
+- Artificial Intelligence
+- Fintech
+- Singapore
+apis:
+- aid: advanceai:advanceai-open-api
+  name: ADVANCE.AI Open API
+  description: >-
+    eKYC building blocks — token authentication, Global Document Verification (SDK licensing, OCR
+    field extraction, ID forgery detection), face comparison, and liveness detection with video
+    evidence and PII data retention. All calls carry a short-lived access token in the
+    X-ACCESS-TOKEN header and share one response envelope; HTTP is always 200 and the `code` field
+    carries the outcome and the billing decision.
+  humanURL: https://doc.advance.ai/
+  baseURL: https://api.advance.ai
+  tags:
+  - Identity Verification
+  - KYC
+  - Face Recognition
+  - Liveness Detection
+  - OCR
+  properties:
+  - type: OpenAPI
+    url: openapi/advanceai-openapi.yml
+  - type: Overlay
+    url: overlays/advanceai-open-api-overlay.yaml
+  - type: Documentation
+    url: https://doc.advance.ai/
+  - type: APIReference
+    url: https://doc.advance.ai/global_document_verification.html
+  - type: Authentication
+    url: authentication/advanceai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/advanceai-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/advanceai-rate-limits.yml
+  - type: DataModel
+    url: data-model/advanceai-data-model.yml
+  - type: X-MCPServerCandidate
+    url: mcp/advanceai-mcp.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/advanceai-agentic-access.yml
 - type: Website
-  url: https://equityzen.com/company/advanceai
+  url: https://advance.ai/
+- type: Documentation
+  url: https://doc.advance.ai/global_document_verification.html
+- type: APIReference
+  url: https://doc.advance.ai/liveness_detection.html
+- type: StatusPage
+  url: https://status.advance.ai/
+- type: Support
+  url: https://support.advance.ai/hc/en-us
+- type: Blog
+  url: https://advance.ai/blog/
+- type: TermsOfService
+  url: https://advance.ai/terms-of-service/
+- type: PrivacyPolicy
+  url: https://advance.ai/privacy-policy/
+- type: SignUp
+  url: https://advance.ai/book-free-demo/
+- type: Compliance
+  url: https://advance.ai/security-compliance/
+- type: Security
+  url: security/advanceai-vulnerability-disclosure.yml
+- type: TrustCenter
+  url: security/advanceai-trust-center.yml
+- type: DomainSecurity
+  url: security/advanceai-domain-security.yml
+- type: VulnerabilityDisclosure
+  url: security/advanceai-vulnerability-disclosure.yml
+- type: Authentication
+  url: authentication/advanceai-authentication.yml
+- type: Conventions
+  url: conventions/advanceai-conventions.yml
+- type: Conformance
+  url: conformance/advanceai-conformance.yml
+- type: ErrorCatalog
+  url: errors/advanceai-error-codes.yml
+- type: Lifecycle
+  url: lifecycle/advanceai-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/advanceai-lifecycle.yml
+- type: RateLimits
+  url: rate-limits/advanceai-rate-limits.yml
+- type: Plans
+  url: plans/advanceai-plans-pricing.yml
+- type: Packages
+  url: packages/advanceai-packages.yml
+- type: SDKs
+  url: packages/advanceai-packages.yml
+- type: DataModel
+  url: data-model/advanceai-data-model.yml
+- type: X-MCPServerCandidate
+  url: mcp/advanceai-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/advanceai-llms.txt
+- type: Overlay
+  url: overlays/advanceai-open-api-overlay.yaml
+x-enrichment:
+  date: '2026-09-07'
+  status: enriched
+  artifacts_added: 24
+  pass: local-v3
+x-parent: advance-intelligence-group
+x-relationship: division

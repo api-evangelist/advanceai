@@ -1,0 +1,87 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/global_document_verification.html
+docs: https://doc.advance.ai/global_document_verification.html
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+  oauth: false
+  openid_connect: false
+  mtls: false
+  note: >-
+    ADVANCE.AI uses a signed key-exchange followed by a bearer-style header token. There is no OAuth
+    2.0, no OpenID Connect and no documented mTLS, so there is no scope surface — see the absence of
+    scopes/ in this repo, which is correct rather than missing.
+schemes:
+- name: AccessToken
+  type: apiKey
+  in: header
+  parameter: X-ACCESS-TOKEN
+  description: >-
+    Short-lived access token obtained from POST /openapi/auth/ticket/v1/generate-token and passed on
+    every other operation. One token is valid across all ADVANCE.AI Open APIs and is reusable until
+    it expires. Requesting a new token does NOT invalidate an outstanding one.
+  sources:
+  - openapi/advanceai-openapi.yml
+  - https://doc.advance.ai/liveness_detection.html
+credentials:
+  issued_via: >-
+    accessKey and secretKey are issued per account and read from the ADVANCE.AI Websaas platform
+    under Account > Account Management. There is no self-service key issuance — access is sales-led
+    via https://advance.ai/book-free-demo/.
+  key_pair:
+  - name: accessKey
+    role: public identifier, sent in the token request body
+  - name: secretKey
+    role: shared secret, never transmitted; used only to compute the signature
+token_exchange:
+  operation_id: generateAccessToken
+  method: POST
+  url: https://api.advance.ai/openapi/auth/ticket/v1/generate-token
+  unauthenticated: true
+  request_fields:
+  - name: accessKey
+    required: true
+  - name: signature
+    required: true
+    description: SHA256 hex digest of the concatenation accessKey + secretKey + timestamp.
+  - name: timestamp
+    required: true
+    description: >-
+      13-digit epoch milliseconds. Must be the same value used inside the signature. ADVANCE.AI
+      suggests staying within 300 seconds of current time; a stale value returns
+      PARAMETER_ERROR "Timestamp error".
+  - name: periodSecond
+    required: false
+    description: Requested token lifetime in seconds. Default 3600, minimum 60, maximum 86400.
+  signature_algorithm: SHA256
+  signature_recipe: SHA256(accessKey || secretKey || timestamp)
+  response_fields:
+  - token
+  - expiredTime
+  token_lifetime_seconds:
+    default: 3600
+    min: 60
+    max: 86400
+failure_modes:
+- code: PARAMETER_ERROR
+  meaning: Missing field, "Timestamp error", or "Signature error".
+  billed: false
+- code: ACCOUNT_DISABLED
+  meaning: Account Disabled — contact the ADVANCE.AI sales manager.
+  billed: false
+- code: IAM_FAILED
+  meaning: >-
+    Returned by the business operations rather than the token endpoint. Covers "Token not found or
+    expired", "Access Key not found or expired", "Account not authorized for this country",
+    "Account not authorized for this domain", "Account is expired" and "Account is disabled".
+  billed: false
+notes:
+- >-
+  The HTTP status is 200 even for authentication failure. Clients must branch on the envelope `code`
+  field, never on the HTTP status.
+- >-
+  ADVANCE.AI explicitly advises re-obtaining a token when the previous one expires, and states the
+  token is shared across every Open API, so one token cache serves the whole integration.

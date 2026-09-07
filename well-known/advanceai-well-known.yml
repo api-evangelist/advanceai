@@ -1,0 +1,98 @@
+generated: '2026-09-07'
+method: probed
+source: live HTTPS probes, 2026-09-07
+summary: >-
+  ADVANCE.AI serves no /.well-known/ discovery document on any host. All five named paths were
+  probed on the registrable domain, the API host, the documentation host and the app host. Every
+  path missed. No WellKnown, SecurityTxt, APICatalog or AgentCard pointer is emitted in apis.yml,
+  because there is nothing served to point at — this file records a verified absence, not a
+  presence.
+hosts:
+- host: advance.ai
+  role: registrable domain / marketing site
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+  - {path: /robots.txt, status: 200, file: advanceai-robots.txt}
+  note: >-
+    WordPress site. The 404s return a full 219KB themed HTML error page, correctly status-coded.
+    robots.txt is served and is fully permissive (User-agent *, Disallow: empty) with a Yoast
+    sitemap reference — nothing here blocks a crawler or an agent.
+- host: www.advance.ai
+  role: www alias
+  documents:
+  - {path: /, status: 301, file: null}
+  note: Permanent redirect to https://advance.ai/. Not probed further; it is the same origin.
+- host: api.advance.ai
+  role: API host (apis[].baseURL and OpenAPI servers[])
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null}
+  - {path: /openapi.yaml, status: 404, file: null}
+  - {path: /swagger.json, status: 404, file: null}
+  - {path: /v1/openapi.json, status: 404, file: null}
+  - {path: /api-docs, status: 404, file: null}
+  - {path: /docs, status: 404, file: null}
+  - {path: /redoc, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+  - {path: /robots.txt, status: 404, file: null}
+  note: >-
+    Clean, honest 404s (548-byte nginx-style HTML). This host serves only the documented API
+    endpoints; it publishes no self-description of any kind.
+- host: doc.advance.ai
+  role: documentation host
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null}
+  - {path: /swagger.json, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+  - {path: /robots.txt, status: 404, file: null}
+  note: >-
+    Static Slate-generated documentation. No machine-readable contract is published beside the
+    human pages, and no robots.txt exists.
+- host: app.advance.ai
+  role: application host, discovered during probing
+  documents:
+  - {path: /.well-known/security.txt, status: 200, file: null, verdict: soft-200}
+  - {path: /.well-known/openid-configuration, status: 200, file: null, verdict: soft-200}
+  - {path: /.well-known/oauth-authorization-server, status: 200, file: null, verdict: soft-200}
+  - {path: /.well-known/api-catalog, status: 200, file: null, verdict: soft-200}
+  - {path: /.well-known/agent-card.json, status: 200, file: null, verdict: soft-200}
+  - {path: /.well-known/agent.json, status: 200, file: null, verdict: soft-200}
+  note: >-
+    FALSE POSITIVE, RECORDED AS A MISS. This host answers HTTP 200 to every path with the identical
+    91-byte ADVANCE.AI error envelope {"code":"ERROR","message":"Server error","data":null,
+    "extra":null,"pricingStrategy":"FREE"}. Nothing here is a document. A probe that reads only the
+    status code would credit ADVANCE.AI with six well-known documents and an A2A agent card it does
+    not publish. The envelope does confirm host ownership — it is ADVANCE.AI's own response shape.
+found: []
+agent_card:
+  found: false
+  note: >-
+    Probed /.well-known/agent-card.json and the legacy /.well-known/agent.json on all four hosts.
+    Three returned 404 and one returned a soft-200 error envelope. No AgentCard pointer is emitted.
+    Nothing was authored on the provider's behalf.
+oauth_metadata:
+  found: false
+  note: Consistent with the auth model — ADVANCE.AI uses a proprietary signed key exchange, not OAuth 2.0, so no authorization-server metadata is expected to exist.
+recommendations_for_provider:
+- Serve /.well-known/security.txt naming the already-published security@advance.ai contact. The commitment exists; only the machine-readable form is missing.
+- Make app.advance.ai return 404 for unknown paths rather than a 200 error envelope. The current behaviour defeats every automated discovery tool and manufactures false positives.

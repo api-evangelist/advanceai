@@ -1,0 +1,101 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/global_document_verification.html
+summary: >-
+  ADVANCE.AI ships first-party MOBILE CAPTURE SDKs, not server-side API client libraries. Android
+  is distributed from the company's own Nexus Maven repository at public-n3.advai.net; iOS is
+  distributed as a zipped xcframework bundle from an Alibaba Cloud OSS bucket. There is no
+  first-party JavaScript, Python, Java, Go, Ruby, PHP, .NET or Rust client for the HTTP API on any
+  public registry — the server-side integration is expected to be hand-rolled against the nine
+  documented endpoints.
+registries_searched:
+  npm: no first-party package (advance-ai, advanceai, advance-ai-sdk, @advance-ai/sdk all HTTP 404 on registry.npmjs.org, probed 2026-09-07)
+  pypi: no first-party package (advance-ai, advanceai both HTTP 404 on pypi.org, probed 2026-09-07)
+  maven_central: not present — ADVANCE.AI self-hosts its Maven artifacts instead
+  nuget: no first-party package found
+  rubygems: no first-party package found
+  packagist: no first-party package found
+  crates_io: no first-party package found
+  pkg_go_dev: no first-party package found
+  github: >-
+    No ADVANCE.AI GitHub organization found. github.com/advance-ai exists but is an individual USER
+    account (GitHub API type "User", id 132907134), not the company org, and is not credited here.
+packages:
+- name: ai.advance.mobile-sdk.android:global-iqa
+  language: Java/Kotlin (Android)
+  platform: Android
+  official: true
+  registry: maven
+  registry_url: https://public-n3.advai.net/repository/maven-releases/
+  metadata_url: https://public-n3.advai.net/repository/maven-releases/ai/advance/mobile-sdk/android/global-iqa/maven-metadata.xml
+  version: 1.5.6.alpha03
+  published: '2026-09-01'
+  latest_stable: 1.5.5
+  release_count: 57
+  docs: https://doc.advance.ai/sdk/android/global-iqc/en/standard.html
+  covers: Global Document Verification image capture and image-quality assessment (IQA).
+  requirements:
+    min_android: '4.4 (API level 19)'
+    compile_sdk: 'API level 36'
+    target_sdk: 'API level 36'
+    abis: [armeabi-v7a, arm64-v8a]
+    incremental_size: 2.3MB+
+    languages: [English, Indonesian, Chinese, Thai]
+  note: >-
+    Read from the provider's own Maven metadata endpoint (HTTP 200, fetched 2026-09-07).
+    lastUpdated 20260901062728. Both <latest> and <release> resolve to an alpha build, which means
+    the newest artifact published to the release repository is a pre-release — the newest STABLE
+    version is 1.5.5. Actively maintained: 2026-09-01 is six days before this probe.
+- name: iOS-GlobalIQA-SDK
+  language: Swift/Objective-C
+  platform: iOS
+  official: true
+  registry: cdn
+  distribution_url: https://prod-guardian-cv.oss-ap-southeast-5.aliyuncs.com/sdk/iOS-global-IQA/latest/iOS-GlobalIQA-SDK.zip
+  version: null
+  published: null
+  documented_version: 'V1.5.2 (stated in the integration guide title)'
+  size_bytes: 19538659
+  docs: https://doc.advance.ai/sdk/ios/global-iqc/en/standard.html
+  covers: Global Document Verification capture on iOS.
+  modules: [AAIGlobalIQASDK.xcframework, AAIGlobalIQAModel.xcframework, AAIGlobalIQAUI, AAINetwork, AAICore]
+  note: >-
+    UNPINNED DISTRIBUTION — the download URL contains the literal path segment "latest" and carries
+    no version. There is no CocoaPods spec, no Swift Package Manager manifest and no registry
+    metadata endpoint to query, so version and published date are recorded as null. A consumer
+    cannot tell from the URL which build they received, and neither can this profile: the zip
+    fetched 2026-09-07 was HTTP 200 and 19.5 MB, and the integration guide separately states V1.5.2.
+    That is the finding. Pinning the iOS distribution would be a meaningful supply-chain
+    improvement.
+- name: Android Liveness Detection SDK
+  language: Java/Kotlin (Android)
+  platform: Android
+  official: true
+  registry: vendor-issued
+  version: 4.3.0
+  published: null
+  docs: https://doc.advance.ai/sdk/android/liveness/en/standard.html
+  covers: Liveness capture, deepfake detection, device security detection and risk-control strategy.
+  requirements:
+    min_android: '4.4 (API level 19)'
+    abis: [armeabi-v7a, arm64-v8a]
+    incremental_size: 4.5MB+
+    languages: [English, Indonesian, Vietnamese, Chinese, Hindi, Thai]
+  note: >-
+    Version 4.3.0 read from the integration guide title, fetched 2026-09-07. No public Maven
+    coordinate was found for this artifact — the metadata endpoint under
+    ai/advance/mobile-sdk/android/ returns 404 for liveness, global-liveness and related names.
+    ADVANCE.AI's own reference states "Please contact operations to get this SDK", so distribution
+    is account-gated. published is null because no dated release record is publicly readable.
+wrappers:
+  cordova: https://doc.advance.ai/sdk/android/global-iqc/en/cordova.html
+  react_native: https://doc.advance.ai/sdk/android/global-iqc/en/react-native.html
+  note: >-
+    Cordova and React Native integration guides exist for the Android Global IQA SDK, but no
+    corresponding npm package is published — these are wrappers you build against the native
+    artifact, not installable packages.
+gaps:
+- No server-side HTTP client library in any language on any public registry.
+- The iOS SDK distribution is unpinned and has no dependency-manager integration.
+- No public source repository for any SDK, so none can be audited or forked.
+- The Liveness SDK is not publicly downloadable; obtaining it requires contacting ADVANCE.AI operations.

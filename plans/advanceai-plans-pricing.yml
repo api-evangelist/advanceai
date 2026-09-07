@@ -1,0 +1,41 @@
+generated: '2026-09-07'
+method: searched
+source: https://advance.ai/
+docs: https://advance.ai/book-free-demo/
+plan_count: 0
+plans: []
+summary: >-
+  ADVANCE.AI publishes no pricing. There is no pricing page anywhere on advance.ai — the sitemap at
+  https://advance.ai/page-sitemap.xml (fetched 2026-09-07, HTTP 200) lists 44 pages and none is a
+  pricing, plans or packages page. The only commercial call to action on the site is "Book a free
+  demo", and the developer documentation routes every entitlement question to a named sales
+  manager. This is a sales-led enterprise motion, not an omission from this profile.
+pricing_model:
+  published: false
+  observed_model: per-call, response-code based
+  detail: >-
+    Although no prices are published, the billing MECHANISM is documented in detail. Every API
+    response carries a `pricingStrategy` field of FREE or PAY, and each documented status code is
+    tagged `free` or `pay` in the reference. Billing is therefore per successful-or-chargeable
+    response code rather than per HTTP request. Four face-comparison failure codes are chargeable —
+    see errors/advanceai-error-codes.yml.
+  balance_model: >-
+    Accounts carry a balance: INSUFFICIENT_BALANCE returns "please top up or contact your sales
+    manager for help", which indicates prepaid or committed-spend accounts rather than
+    pay-as-you-go card billing.
+  free_allocation: >-
+    A free query quota exists per account, and a separate one for test accounts (OVER_QUERY_LIMIT).
+    No figure is published.
+onboarding:
+  self_service: false
+  signup_url: https://advance.ai/book-free-demo/
+  note: >-
+    No self-service sign-up exists. Access keys are issued into the ADVANCE.AI Websaas platform and
+    read from Account > Account Management after a commercial relationship is established.
+evidence:
+- url: https://advance.ai/page-sitemap.xml
+  status: 200
+  finding: 44 pages, no pricing/plans page.
+- url: https://advance.ai/book-free-demo/
+  status: 200
+  finding: The only commercial entry point.

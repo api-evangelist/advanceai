@@ -1,0 +1,142 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/global_document_verification.html
+docs: https://doc.advance.ai/liveness_detection.html
+format: vendor-envelope
+rfc9457: false
+summary: >-
+  ADVANCE.AI does not use HTTP status codes or RFC 9457 problem+json. Every Open API call returns
+  HTTP 200 with a JSON envelope, and the `code` string carries the real outcome. ADVANCE.AI's own
+  Glossary instructs clients to branch on `code` and NOT on `message`, because message text changes
+  without notice. The `code` also decides billing: each documented code carries a `free` or `pay`
+  tag, and a `pay` code is charged even when it describes a failure.
+envelope:
+  transport_status: 200
+  fields:
+  - name: code
+    description: The ADVANCE.AI status code. The authoritative outcome field.
+  - name: message
+    description: Human explanation. Explicitly NOT stable — do not branch on it.
+  - name: data
+    description: Operation-specific payload; null on most errors.
+  - name: extra
+    description: Exception message. Usually empty.
+  - name: transactionId
+    description: Request id, max 64 characters. ADVANCE.AI strongly recommends persisting it for support.
+  - name: pricingStrategy
+    description: FREE or PAY — whether this response was billed.
+shared_codes:
+- code: SUCCESS
+  billed: pay
+  message: OK
+  meaning: The call succeeded. Note some operations return SUCCESS with pricingStrategy FREE; check per-operation.
+  action: Proceed.
+- code: ERROR
+  billed: free
+  message: Server error
+  meaning: Unclassified server-side failure.
+  action: Retry with backoff; escalate to ADVANCE.AI support with the transactionId.
+- code: EMPTY_PARAMETER_ERROR
+  billed: free
+  message: Parameter should not be empty
+  meaning: A mandatory parameter (one without an `optional` tag) was omitted.
+  action: Fix the request. Do not retry unchanged.
+- code: PARAMETER_ERROR
+  billed: free
+  message: Varies — detailed error description
+  meaning: >-
+    Malformed or illegal parameter. Documented variants include "Parameter should not be empty",
+    "Timestamp error", "Signature error", "Parameter error, please check your request whether has
+    illegal parameters", and phone-number format errors. ADVANCE.AI's stated phone format is country
+    code + number with no leading zero, dash or space.
+  action: Fix the request. Do not retry unchanged.
+- code: IAM_FAILED
+  billed: free
+  message: Access denied (several variants)
+  meaning: >-
+    Identity and Access Management rejection. Variants — not authorized by IAM, Access Key not
+    found, Token not found or expired, Access Key not found or expired, Account not authorized for
+    this country, Account not authorized for this domain, Account is expired, Account is disabled.
+  action: Re-obtain a token; if it persists, the account entitlement is the problem — contact the sales manager.
+- code: INSUFFICIENT_BALANCE
+  billed: free
+  message: Insufficient balance, please top up or contact your sales manager for help
+  meaning: Prepaid balance exhausted.
+  action: Top up. Retrying will not succeed.
+- code: SERVICE_BUSY
+  billed: free
+  message: Rate limit is exceeded / Quota exceeded
+  meaning: >-
+    Rate limit or daily free-query quota exceeded. ADVANCE.AI returns a Retry-After HTTP header
+    (documented example "Retry-After: 10s") and notes this code "may migrate to HTTP 429 Too Many
+    Requests in the future".
+  action: Honour Retry-After and back off. See rate-limits/advanceai-rate-limits.yml.
+- code: OVER_QUERY_LIMIT
+  billed: free
+  message: Quota exceeded — free query quota, or free query quota for test account
+  meaning: The free query allocation for the account or test account is used up.
+  action: Contact the sales manager for a paid allocation.
+- code: CLIENT_ERROR
+  billed: free
+  message: HTTP client error, e.g. "HTTP 400 - Bad Request", "HTTP 404 - Not Found", "HTTP 405 - Method Not Allowed"
+  meaning: The request itself was malformed at the HTTP layer — wrong path, wrong verb, wrong content type.
+  action: Re-read the API reference. Do not retry unchanged.
+- code: RETRY_LATER
+  billed: free
+  message: Query failed, please retry after the suggested time in HTTP Header
+  meaning: Transient failure with an explicit retry hint.
+  action: Honour the Retry-After header.
+operation_codes:
+- operation_id: generateAccessToken
+  codes:
+  - {code: SUCCESS, billed: free, message: OK}
+  - {code: PARAMETER_ERROR, billed: free, message: Parameter should not be empty / Timestamp error / Signature error}
+  - {code: ACCOUNT_DISABLED, billed: free, message: Account Disabled}
+  - {code: CLIENT_ERROR, billed: free, message: HTTP 400 - Bad Request}
+- operation_id: authorizeDocumentVerificationLicense
+  codes:
+  - {code: ACCESS_DENIED, billed: free, message: Access denied}
+  - {code: SERVICE_DISABLED, billed: free, message: Service disabled}
+- operation_id: queryDocumentVerificationResult
+  codes:
+  - {code: IDVID_NOT_EXISTS, billed: free, message: The IDVID not exists}
+  - {code: PARAMETER_ERROR, billed: free, message: Parameter should not be empty / illegal parameters}
+- operation_id: compareFaces
+  codes:
+  - {code: IMAGE_INVALID_FORMAT, billed: free, message: 'Invalid image format, image format should be one of jpeg/jpg/png'}
+  - {code: IMAGE_INVALID_SIZE, billed: free, message: 'Invalid image size, max 2M, dimensions between 256x256 and 4096x4096'}
+  - {code: NO_FACE_DETECTED_FROM_FIRST_IMAGE, billed: pay, message: No Face detected from the uploaded first picture}
+  - {code: NO_FACE_DETECTED_FROM_SECOND_IMAGE, billed: pay, message: No Face detected from the uploaded second picture}
+  - {code: FIRST_IMAGE_LOW_QUALITY_FACE, billed: pay, message: Face quality is too low of the uploaded first picture}
+  - {code: SECOND_IMAGE_LOW_QUALITY_FACE, billed: pay, message: Face quality is too low of the uploaded second picture}
+- operation_id: authorizeLivenessLicense
+  codes:
+  - {code: ACCESS_DENIED, billed: free, message: Access denied}
+  - {code: SERVICE_DISABLED, billed: free, message: Service disabled}
+- operation_id: getLivenessDetectionResult
+  codes:
+  - {code: LIVENESS_ID_NOT_EXISTED, billed: free, message: Liveness Id does not exist}
+  - {code: RESULT_NOT_FOUND, billed: free, message: The requested resource was not found or has been deleted}
+  - {code: PARAMETER_ERROR, billed: free, message: Parameter error, please check your request whether has illegal parameters}
+- operation_id: getLivenessVideo
+  codes:
+  - {code: LIVENESS_ID_NOT_EXISTED, billed: free, message: Liveness Id not exist}
+  - {code: SIGNATURE_ID_NOT_EXIST, billed: free, message: SignatureId is not exist}
+  - {code: VIDEO_NOT_FOUND, billed: free, message: The requested resource was not found or has been deleted}
+  - {code: PARAMETER_ERROR, billed: free, message: Parameter error}
+  - {code: ERROR, billed: free, message: Server error}
+- operation_id: clearLivenessPiiData
+  codes:
+  - {code: SUCCESS, billed: free, message: OK}
+  - {code: PARAMETER_ERROR, billed: free, message: Parameter error}
+  - {code: ERROR, billed: free, message: server error}
+billing_note: >-
+  This is the unusual property of the ADVANCE.AI error model and an agent must be told about it:
+  four face-comparison FAILURE codes are tagged `pay`. NO_FACE_DETECTED_FROM_FIRST_IMAGE,
+  NO_FACE_DETECTED_FROM_SECOND_IMAGE, FIRST_IMAGE_LOW_QUALITY_FACE and
+  SECOND_IMAGE_LOW_QUALITY_FACE all bill. Blind retry of a bad image costs money each attempt;
+  validate format, size and dimensions client-side before calling.
+counts:
+  shared: 10
+  operation_specific: 15
+  total_distinct: 21

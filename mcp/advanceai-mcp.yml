@@ -1,0 +1,90 @@
+generated: '2026-09-07'
+method: derived
+source: openapi/advanceai-openapi.yml
+status: candidate
+summary: >-
+  ADVANCE.AI ships NO MCP server. This file is a candidate tool list API Evangelist derived from
+  the nine documented Open API operations so an agent builder can see what a server would expose.
+  It is not a product, not an endpoint, and nothing here is callable. The apis.yml pointer is
+  type X-MCPServerCandidate, never MCPServer.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: api-key
+  verified: derived
+  note: >-
+    Searched the ADVANCE.AI site, the documentation host and the wider web for a hosted or stdio
+    MCP server on 2026-09-07 and found none. Probed mcp.advance.ai (DNS does not resolve). No npm
+    or PyPI package exists under any ADVANCE.AI name. `auth: api-key` records what a server WOULD
+    need — the X-ACCESS-TOKEN header token — not an auth mode of a server that exists.
+search_evidence:
+- {url: 'https://mcp.advance.ai/', status: 0, finding: DNS does not resolve}
+- {url: 'https://api.advance.ai/.well-known/ai-plugin.json', status: 404}
+- {url: 'https://registry.npmjs.org/advance-ai', status: 404}
+- {query: 'ADVANCE.AI MCP server model context protocol eKYC', finding: no result naming an ADVANCE.AI MCP server}
+candidate_tools:
+- name: generate_access_token
+  rest_operation_id: generateAccessToken
+  description: Exchange an access key and SHA256 signature for a short-lived X-ACCESS-TOKEN.
+  consequence: low
+  note: >-
+    In a real server this would be internal plumbing, not an exposed tool — the server should hold
+    the key pair and refresh the token itself rather than handing an agent a credential exchange.
+- name: authorize_document_verification_license
+  rest_operation_id: authorizeDocumentVerificationLicense
+  description: Issue a time-limited license for the Global Document Verification mobile SDK.
+  consequence: medium
+  billable: true
+- name: query_document_verification_result
+  rest_operation_id: queryDocumentVerificationResult
+  description: Retrieve the document image, OCR field extraction and ID forgery verdict for an IDVID.
+  consequence: medium
+  billable: true
+  handles_pii: true
+- name: compare_faces
+  rest_operation_id: compareFaces
+  description: Compare two face photographs and return a 0-100 similarity score with bounding boxes.
+  consequence: medium
+  billable: true
+  handles_pii: true
+  note: Four failure codes on this operation are chargeable — an agent retrying a bad image bills each time.
+- name: generate_liveness_signature_id
+  rest_operation_id: generateLivenessSignatureId
+  description: Allocate a single-use signatureId for one liveness capture session.
+  consequence: low
+- name: authorize_liveness_license
+  rest_operation_id: authorizeLivenessLicense
+  description: Issue a time-limited license for the Liveness Detection mobile SDK.
+  consequence: medium
+  billable: true
+- name: get_liveness_detection_result
+  rest_operation_id: getLivenessDetectionResult
+  description: Retrieve the liveness score, captured images and attack classification for a session.
+  consequence: medium
+  billable: true
+  handles_pii: true
+- name: get_liveness_video
+  rest_operation_id: getLivenessVideo
+  description: Retrieve a 24-hour link to the recorded liveness video.
+  consequence: medium
+  handles_pii: true
+  note: Requires SDK above 4.0.0 and video recording enabled on the account by ADVANCE.AI.
+- name: clear_liveness_pii_data
+  rest_operation_id: clearLivenessPiiData
+  description: Permanently delete the PII held for one liveness detection.
+  consequence: HIGH_IRREVERSIBLE
+  requires_confirmation: true
+  note: >-
+    NO REVERSAL EXISTS. See conventions/advanceai-conventions.yml reversibility. Any MCP server
+    exposing this operation should gate it behind explicit human confirmation; there is no restore
+    and no recovery window.
+tool_count: 9
+input_schemas: >-
+  Derivable in full from openapi/advanceai-openapi.yml — every operation's requestBody and query
+  parameters are documented. A server implementer does not need to guess any input.
+caveats:
+- No MCP server exists. Do not present this file as an agent-callable surface.
+- The input schemas trace to a spec API Evangelist authored from documentation, not to a provider-published contract.
+- Two mobile SDK steps sit inside both the document-verification and liveness flows. An agent cannot complete either flow end to end over HTTP alone — a human must present a document or a face to a phone camera. This is the structural reason ADVANCE.AI is a poor fit for a fully autonomous agent surface, and it should be stated plainly rather than papered over with tools.

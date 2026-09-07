@@ -1,0 +1,94 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the ADVANCE.AI Open API
+  version: 1.0.0
+  description: >-
+    Enhancements API Evangelist layers over openapi/advanceai-openapi.yml. Records the runtime
+    semantics an integrator or agent needs that the ADVANCE.AI documentation states in prose but no
+    contract expresses — the always-200 status convention, the chargeable failure codes, the
+    irreversibility of the PII deletion operation, and the 24-hour expiry on every returned asset.
+    Applied as a layer so the base document stays a faithful transcription of the published docs.
+x-generated: '2026-09-07'
+x-method: generated
+x-source: openapi/advanceai-openapi.yml
+extends: ../openapi/advanceai-openapi.yml
+actions:
+- target: $.info
+  description: Flag the transport convention that breaks naive HTTP clients.
+  update:
+    x-http-status-convention:
+      always: 200
+      outcome_field: code
+      warning: >-
+        Every response is HTTP 200, including authentication failure, quota exhaustion and server
+        error. A client that branches on HTTP status will read every failure as a success. Branch
+        on the envelope `code` field.
+    x-message-field-unstable: >-
+      ADVANCE.AI states the `message` field may change without notice. Never branch on it.
+    x-asset-url-ttl-hours: 24
+- target: $.paths['/openapi/face-recognition/v4/check'].post
+  description: Record that four failure codes on this operation are chargeable.
+  update:
+    x-billable-failures:
+    - NO_FACE_DETECTED_FROM_FIRST_IMAGE
+    - NO_FACE_DETECTED_FROM_SECOND_IMAGE
+    - FIRST_IMAGE_LOW_QUALITY_FACE
+    - SECOND_IMAGE_LOW_QUALITY_FACE
+    x-retry-guidance: >-
+      Do not retry on these codes. Each attempt bills. Validate format, file size and dimensions
+      client-side before calling.
+    x-agentic-access:
+      action_class: write
+      consequence: billed
+      escalation: none
+- target: $.paths['/liveness/ext/v1/clear-data'].get
+  description: Mark the destructive operation as irreversible and confirmation-gated.
+  update:
+    x-reversibility:
+      grade: none
+      reversal_operation: null
+      window: null
+      note: No restore, undo or recovery window is documented. Deletion is terminal.
+    x-agentic-access:
+      action_class: delete
+      consequence: irreversible
+      escalation: human-confirmation-required
+- target: $.paths['/liveness/ext/v1/get-video'].get
+  description: Record the account-level precondition and the deprecated field.
+  update:
+    x-preconditions:
+    - SDK version above 4.0.0
+    - Video recording enabled on the account by ADVANCE.AI (not enabled by default)
+    x-deprecated-fields:
+    - field: pricingStrategy
+      note: ADVANCE.AI documents it as deprecated on this operation; always returns FREE.
+- target: $.paths['/intl/openapi/face-identity/document-verification/v1/query'].post
+  description: Record that the addressing identifier is minted outside this API.
+  update:
+    x-external-identifier:
+      field: IDVID
+      minted_by: the Global Document Verification mobile SDK
+      note: >-
+        No HTTP operation creates an IDVID. An agent cannot complete this flow without a human
+        presenting a document to a phone camera.
+- target: $.paths['/openapi/liveness/v3/detection-result'].post
+  description: Same structural constraint on the liveness flow.
+  update:
+    x-external-identifier:
+      field: livenessId
+      minted_by: the Liveness Detection mobile SDK
+    x-score-interpretation:
+      threshold: 50
+      above: pass
+      below: manual check
+      source: https://doc.advance.ai/liveness_detection.html
+- target: $.components.securitySchemes.AccessToken
+  description: Record the token lifecycle facts an implementer needs.
+  update:
+    x-token-lifecycle:
+      shared_across_apis: true
+      reissue_invalidates_previous: false
+      lifetime_seconds: {default: 3600, min: 60, max: 86400}
+      refresh_strategy: >-
+        Cache one token per account and refresh on expiredTime. Because reissue does not invalidate
+        an outstanding token, refresh can be done ahead of expiry with no cutover gap.

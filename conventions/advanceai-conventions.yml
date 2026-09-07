@@ -1,0 +1,177 @@
+generated: '2026-09-07'
+method: searched
+source: https://doc.advance.ai/global_document_verification.html
+docs:
+- https://doc.advance.ai/global_document_verification.html
+- https://doc.advance.ai/liveness_detection.html
+- https://doc.advance.ai/face_recognition.html
+summary: >-
+  ADVANCE.AI's Open API is a small, envelope-shaped RPC surface. Nine documented operations, all
+  POST except two liveness GETs, all under one host and one header token. Cross-cutting semantics
+  are documented centrally in the Glossary that repeats at the foot of every reference page.
+auth_style:
+  model: header token
+  header: X-ACCESS-TOKEN
+  obtained_by: POST /openapi/auth/ticket/v1/generate-token
+  scopes: none
+  detail: See authentication/advanceai-authentication.yml.
+transport:
+  base_url: https://api.advance.ai
+  http_status_semantics: >-
+    Always 200, including on business and authentication failure. The envelope `code` is the only
+    outcome signal. This is the single most important convention for an agent to internalise: an
+    HTTP-status-based retry policy will treat every ADVANCE.AI failure as a success.
+  content_types:
+  - application/json
+  - multipart/form-data (compareFaces only)
+  response_content_type: application/json
+error_envelope:
+  shape: {code: string, message: string, data: object|null, extra: string|null, transactionId: string, pricingStrategy: FREE|PAY}
+  branch_on: code
+  do_not_branch_on: message
+  provider_statement: >-
+    "Please use 'Status Code' in your strategy instead of 'Message', as 'Message' is a detailed
+    explanation for developer's reference and may update without ADVANCE Notice."
+  detail: See errors/advanceai-error-codes.yml.
+request_id_tracing:
+  field: transactionId
+  location: response body
+  max_length: 64
+  header: none published
+  provider_statement: '"It is strongly recommended to save the transactionId."'
+  note: >-
+    There is no request-supplied correlation id and no response header carrying one. Tracing is
+    read-back-only: you learn the id after the fact and must store it yourself.
+pagination:
+  supported: false
+  note: No list or collection operation exists in the documented surface, so no pagination style is defined.
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+metadata:
+  supported: false
+  note: No customer-supplied metadata or tagging field is documented on any operation.
+versioning:
+  style: path segment, per service
+  observed:
+  - /openapi/auth/ticket/v1/generate-token
+  - /intl/openapi/face-identity/document-verification/v1/*
+  - /openapi/face-recognition/v4/check
+  - /liveness/ext/v1/*
+  - /openapi/liveness/v1/auth-license
+  - /openapi/liveness/v3/detection-result
+  note: >-
+    Versions are per-service and unsynchronised — face-recognition is at v4 while its liveness
+    sibling result endpoint is at v3 and the liveness license at v1. There is no global API version,
+    no version header, and no published policy governing when a path version increments.
+  detail: See lifecycle/advanceai-lifecycle.yml.
+rate_limit_signaling:
+  headers:
+  - Retry-After
+  status_codes: []
+  envelope_codes: [SERVICE_BUSY, RETRY_LATER, OVER_QUERY_LIMIT]
+  note: >-
+    Retry-After is returned as an HTTP header alongside a 200/SERVICE_BUSY envelope. ADVANCE.AI
+    states SERVICE_BUSY "may migrate to HTTP 429 Too Many Requests in the future" — clients should
+    handle both today.
+  detail: See rate-limits/advanceai-rate-limits.yml.
+idempotency:
+  coverage: none
+  mechanism: none
+  header: null
+  scope: []
+  note: >-
+    ADVANCE.AI publishes no idempotency key, no request-deduplication window and no replay
+    protection on any of the seven mutating operations. Three of them are chargeable and one
+    (clearLivenessPiiData) is destructive, so a retried write is a real risk: a repeated
+    compareFaces call bills again, and a repeated auth-license call issues a second license.
+    Callers must implement their own deduplication keyed on their own identifiers.
+  affected_operations:
+  - generateAccessToken
+  - authorizeDocumentVerificationLicense
+  - queryDocumentVerificationResult
+  - compareFaces
+  - generateLivenessSignatureId
+  - authorizeLivenessLicense
+  - getLivenessDetectionResult
+  - clearLivenessPiiData
+reversibility:
+  grade: none
+  applicable: true
+  note: >-
+    The API has a write surface, so reversibility applies — but ADVANCE.AI documents no reversal
+    operation of any kind. There is no cancel, void, undo, restore or rollback in the published
+    reference, and no window inside which any action can be taken back.
+  write_surfaces:
+  - operation_id: clearLivenessPiiData
+    action: Permanently deletes the PII held for one liveness detection.
+    reversal_operation: null
+    window: null
+    grade: none
+    note: >-
+      This is the highest-consequence irreversible operation in the surface and an agent must treat
+      it as terminal. The documentation describes deletion for compliance purposes and states no
+      recovery path, no soft-delete and no grace period. Nothing in the reference restores cleared
+      data. NEVER infer a recovery window here — none is stated.
+  - operation_id: authorizeDocumentVerificationLicense
+    action: Issues a time-limited SDK license.
+    reversal_operation: null
+    window: null
+    grade: none
+    note: >-
+      Licenses cannot be revoked through the API. They expire on their own after
+      licenseEffectiveSeconds (default 600, maximum 86400) — expiry is the only exit, and it is a
+      timeout, not a reversal.
+  - operation_id: authorizeLivenessLicense
+    action: Issues a time-limited SDK license.
+    reversal_operation: null
+    window: null
+    grade: none
+  - operation_id: generateLivenessSignatureId
+    action: Allocates a single-use liveness signatureId.
+    reversal_operation: null
+    window: null
+    grade: none
+    note: A signatureId is single-use and cannot be released or recycled; obtain a new one per detection.
+  - operation_id: compareFaces
+    action: Chargeable read-like comparison with no stored side effect, but it bills.
+    reversal_operation: null
+    window: null
+    grade: none
+    note: No refund or credit mechanism is documented, including for the four `pay`-tagged failure codes.
+dry_run_mode:
+  supported: false
+  note: >-
+    No sandbox host, no test-mode key prefix and no simulation flag is documented. The docs mention
+    a "test account" with a free query quota (OVER_QUERY_LIMIT) and a demo APK, but neither is a
+    documented dry-run facility an integrator can invoke.
+data_handling:
+  image_constraints:
+    formats: [PNG, JPG, JPEG]
+    max_file_size: 2 MB
+    min_resolution: 256x256
+    max_resolution: 4096x4096
+    ocr_extra: >-
+      ID card must be readable, vertical or horizontal and not tilted ~45 degrees, unobscured, on a
+      clean background.
+  url_expiry: >-
+    Every returned image and video URL — document image, liveness detectionResult, imageFarUrl,
+    imageNearUrl, auditImageUrl, videoUrl — is valid for 24 hours only. Re-query for a fresh link.
+    Do not treat these as durable references.
+  pii_posture: >-
+    This API handles identity documents, faces and liveness video. clearLivenessPiiData is provided
+    specifically so customers with retention obligations can delete it.
+geography:
+  note: >-
+    ADVANCE.AI states the service is deployed outside mainland China and advises callers whose
+    test or production environment is in China to route via VPN to avoid packet loss and timeouts.
+  account_scoping: >-
+    IAM_FAILED includes "Account not authorized for this country" and "Account not authorized for
+    this domain" — entitlement is scoped per country and per calling domain.
+cross_links:
+  errors: errors/advanceai-error-codes.yml
+  lifecycle: lifecycle/advanceai-lifecycle.yml
+  authentication: authentication/advanceai-authentication.yml
+  rate_limits: rate-limits/advanceai-rate-limits.yml
+  conformance: conformance/advanceai-conformance.yml

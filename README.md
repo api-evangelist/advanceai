@@ -64,5 +64,81 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Advanceai is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://equityzen.com/company/advanceai
+# ADVANCE.AI
+
+ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+business unit of **Advance Intelligence Group**, headquartered in Singapore and founded in 2016.
+Its AdvanGuard product line covers identity verification, document verification, face
+authentication and Know Your Business checks for banking and financial services, fintech, crypto,
+payments, e-commerce and the sharing economy, with a strong footprint across Southeast Asia and
+other emerging markets.
+
+- Website — https://advance.ai/
+- API documentation — https://doc.advance.ai/
+- API host — https://api.advance.ai
+- Status — https://status.advance.ai/
+- Request access — https://advance.ai/book-free-demo/
+
+## What ADVANCE.AI publishes
+
+A public **Open API** with nine documented operations across four services: token authentication,
+Global Document Verification (SDK licensing, OCR field extraction, ID forgery detection), face
+comparison, and liveness detection (signature, licensing, result, video evidence, and programmatic
+PII deletion). Plus first-party Android and iOS capture SDKs distributed from ADVANCE.AI's own
+Nexus Maven repository and object storage.
+
+Two properties of this API matter more than anything else in it:
+
+1. **Every response is HTTP 200.** Success, authentication failure, quota exhaustion and server
+   error all return 200, and the real outcome lives in the JSON envelope field `code`. A client
+   that branches on HTTP status reads every failure as a success.
+2. **Billing is per response code, and four failure codes are chargeable.** Each documented status
+   code carries a `free` or `pay` tag. On face comparison, "no face detected" and "face quality too
+   low" both bill — so a blind retry loop on a bad image costs money every attempt.
+
+## Not published by ADVANCE.AI
+
+Recorded here so an absence reads as measured rather than missing. Each was probed on 2026-09-07.
+
+- **No OpenAPI or Swagger.** `/openapi.json`, `/openapi.yaml`, `/swagger.json`, `/v1/openapi.json`,
+  `/api-docs`, `/docs` and `/redoc` all return 404 on `api.advance.ai` and on `doc.advance.ai`.
+  The specification in `openapi/` was **authored by API Evangelist from the published
+  documentation** and is marked as such in its own provenance block. It is not a provider artifact.
+- **No `/.well-known/` document of any kind** on any host — see `well-known/` for the full probe
+  table, including a soft-200 catch-all on `app.advance.ai` that answers every path with an error
+  envelope and would otherwise register as six false positives.
+- **No A2A agent card**, **no MCP server**, **no GraphQL, gRPC, WSDL or AsyncAPI surface**, and
+  **no webhooks or events**.
+- **No server-side client library** on npm, PyPI, Maven Central, NuGet, RubyGems, Packagist,
+  crates.io or pkg.go.dev, and no ADVANCE.AI GitHub organization.
+- **No published pricing and no self-service sign-up.** The site has no pricing page; access is
+  sales-led through a demo request.
+- **No idempotency mechanism, no reversal operation, no sandbox and no dated API changelog.**
+
+## Notable findings
+
+- **`clearLivenessPiiData` is irreversible.** ADVANCE.AI offers a programmatic PII erasure endpoint
+  — an uncommon and genuinely useful privacy affordance — but documents no restore, no soft delete
+  and no recovery window. Recorded in `conventions/` and gated behind human confirmation in the
+  skills.
+- **The published reference is a subset of the running surface.** The status page lists a
+  production component named `curp-info-check` (CURP is the Mexican national identity number) that
+  has no page in the public API reference.
+- **Certifications are badge images, not text.** BSI, iBeta Level 1 and iBeta Level 2 certificate
+  images are displayed on the Security & Compliance page with no certificate number, scope or
+  expiry in machine-readable form. This profile records that the badges are displayed and does not
+  assert what they cover. ISO 27001, PCI DSS and HIPAA appear on that page only as generic examples
+  of regulatory standards and are **not** credited as certifications ADVANCE.AI holds.
+- **A security contact exists but is not discoverable by machine.** `security@advance.ai` is
+  published in HTML prose; `/.well-known/security.txt` returns 404 everywhere. Serving RFC 9116
+  would make an existing commitment machine-readable at near-zero cost.
+- **The iOS SDK distribution is unpinned** — the download URL contains the literal path segment
+  `latest` and carries no version, so a consumer cannot tell which build they received.
+
+## Related records in this network
+
+ADVANCE.AI is one business unit of Advance Intelligence Group, which also operates Atome Financial
+and Ginee. The parent company is profiled separately at `all/advance-intelligence-group/`, and that
+record was itself enriched from this same `doc.advance.ai` surface. A third stub exists at
+`all/advance.ai/`. **These records overlap and should be reconciled by a human** — see
+`x-parent-company` and `x-duplicate-candidates` in `apis.yml`.
