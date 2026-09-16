@@ -42,27 +42,89 @@ tags:
 - Fintech
 - Singapore
 apis:
-- aid: advanceai:advanceai-open-api
-  name: ADVANCE.AI Open API
-  description: >-
-    eKYC building blocks — token authentication, Global Document Verification (SDK licensing, OCR
-    field extraction, ID forgery detection), face comparison, and liveness detection with video
-    evidence and PII data retention. All calls carry a short-lived access token in the
-    X-ACCESS-TOKEN header and share one response envelope; HTTP is always 200 and the `code` field
-    carries the outcome and the billing decision.
+- aid: advanceai:advanceai-authentication-api
+  name: ADVANCE.AI Authentication API
+  description: Exchange an access key and request signature for a short-lived access token.
   humanURL: https://doc.advance.ai/
   baseURL: https://api.advance.ai
   tags:
-  - Identity Verification
-  - KYC
-  - Face Recognition
-  - Liveness Detection
-  - OCR
+  - Authentication
   properties:
   - type: OpenAPI
-    url: openapi/advanceai-openapi.yml
-  - type: Overlay
-    url: overlays/advanceai-open-api-overlay.yaml
+    url: openapi/advanceai-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://doc.advance.ai/
+  - type: APIReference
+    url: https://doc.advance.ai/global_document_verification.html
+  - type: Authentication
+    url: authentication/advanceai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/advanceai-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/advanceai-rate-limits.yml
+  - type: DataModel
+    url: data-model/advanceai-data-model.yml
+  - type: X-MCPServerCandidate
+    url: mcp/advanceai-mcp.yml
+- aid: advanceai:advanceai-document-verification-api
+  name: ADVANCE.AI Document Verification API
+  description: >-
+    Global Document Verification — SDK licensing and result query with OCR and forgery detection.
+  humanURL: https://doc.advance.ai/
+  baseURL: https://api.advance.ai
+  tags:
+  - Document Verification
+  properties:
+  - type: OpenAPI
+    url: openapi/advanceai-document-verification-api-openapi.yml
+  - type: Documentation
+    url: https://doc.advance.ai/
+  - type: APIReference
+    url: https://doc.advance.ai/global_document_verification.html
+  - type: Authentication
+    url: authentication/advanceai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/advanceai-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/advanceai-rate-limits.yml
+  - type: DataModel
+    url: data-model/advanceai-data-model.yml
+  - type: X-MCPServerCandidate
+    url: mcp/advanceai-mcp.yml
+- aid: advanceai:advanceai-face-comparison-api
+  name: ADVANCE.AI Face Comparison API
+  description: Compare two face photographs and return a similarity score.
+  humanURL: https://doc.advance.ai/
+  baseURL: https://api.advance.ai
+  tags:
+  - Face Comparison
+  properties:
+  - type: OpenAPI
+    url: openapi/advanceai-face-comparison-api-openapi.yml
+  - type: Documentation
+    url: https://doc.advance.ai/
+  - type: APIReference
+    url: https://doc.advance.ai/global_document_verification.html
+  - type: Authentication
+    url: authentication/advanceai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/advanceai-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/advanceai-rate-limits.yml
+  - type: DataModel
+    url: data-model/advanceai-data-model.yml
+  - type: X-MCPServerCandidate
+    url: mcp/advanceai-mcp.yml
+- aid: advanceai:advanceai-liveness-detection-api
+  name: ADVANCE.AI Liveness Detection API
+  description: Liveness session licensing, result retrieval, video evidence and PII data retention.
+  humanURL: https://doc.advance.ai/
+  baseURL: https://api.advance.ai
+  tags:
+  - Liveness Detection
+  properties:
+  - type: OpenAPI
+    url: openapi/advanceai-liveness-detection-api-openapi.yml
   - type: Documentation
     url: https://doc.advance.ai/
   - type: APIReference
