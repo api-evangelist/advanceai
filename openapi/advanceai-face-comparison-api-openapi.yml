@@ -1,0 +1,213 @@
+openapi: 3.2.0
+info:
+  title: ADVANCE.AI Open Face Comparison API
+  version: '1.0'
+  summary: eKYC building blocks — token authentication, global document verification, face comparison and liveness detection.
+  description: 'ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+
+    business unit of Advance Intelligence Group (Singapore).'
+  contact:
+    name: ADVANCE.AI
+    url: https://advance.ai/contact-us/
+  termsOfService: https://advance.ai/terms-of-service/
+  x-generated-from: documentation
+  x-authored-by: API Evangelist
+  x-modeled-from: https://doc.advance.ai/
+  x-provenance:
+    method: generated
+    generated: '2026-09-07'
+    sources:
+    - url: https://doc.advance.ai/global_document_verification.html
+      status: 200
+    - url: https://doc.advance.ai/liveness_detection.html
+      status: 200
+    - url: https://doc.advance.ai/face_recognition.html
+      status: 200
+    note: Transcribed from published documentation. Not a provider-published contract.
+servers:
+- url: https://api.advance.ai
+  description: Production host. ADVANCE.AI notes the service is deployed outside mainland China.
+security:
+- AccessToken: []
+tags:
+- name: Face Comparison
+  description: Compare two face photographs and return a similarity score.
+paths:
+  /openapi/face-recognition/v4/check:
+    post:
+      tags:
+      - Face Comparison
+      operationId: compareFaces
+      summary: Compare two face photographs
+      description: 'Uploads two face photographs and returns a similarity rate between 0 and 100, plus the
+
+        bounding box and detected gender for each face. If several faces are present the largest is
+
+        selected. Flip angles of 90, 180 and 270 degrees are supported but reduce accuracy.
+
+        ADVANCE.AI''s published guidance: above 70 pass, 55–70 manual check, below 55 reject or
+
+        verify by another method. Images must be PNG/JPG/JPEG, under 2 MB, and between 256x256 and
+
+        4096x4096.'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - firstImage
+              - secondImage
+              properties:
+                firstImage:
+                  type: string
+                  format: binary
+                  description: The first picture to be uploaded.
+                secondImage:
+                  type: string
+                  format: binary
+                  description: The second picture to be uploaded.
+      responses:
+        '200':
+          description: 'Envelope response. `code` is SUCCESS (pay), IMAGE_INVALID_FORMAT (free),
+
+            IMAGE_INVALID_SIZE (free), NO_FACE_DETECTED_FROM_FIRST_IMAGE (pay),
+
+            NO_FACE_DETECTED_FROM_SECOND_IMAGE (pay), FIRST_IMAGE_LOW_QUALITY_FACE (pay) or
+
+            SECOND_IMAGE_LOW_QUALITY_FACE (pay).
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/FaceComparisonResult'
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    transactionId: 196eb0c777789e58
+                    pricingStrategy: PAY
+                    message: OK
+                    data:
+                      similarity: 69.0
+                      firstFace:
+                        id: '1'
+                        left: 618.0
+                        top: 227.0
+                        right: 715.0
+                        bottom: 350.0
+                        gender: MALE
+                      secondFace:
+                        id: '2'
+                        left: 316.0
+                        top: 552.0
+                        right: 894.0
+                        bottom: 1321.0
+                        gender: MALE
+                    extra: null
+                noFaceFirst:
+                  value:
+                    code: NO_FACE_DETECTED_FROM_FIRST_IMAGE
+                    message: No Face detected from the uploaded first picture
+                    data: null
+                    extra: null
+                    transactionId: 7196eb0c77789e58
+                    pricingStrategy: PAY
+components:
+  schemas:
+    FaceComparisonResult:
+      type: object
+      properties:
+        similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Similarity between the two faces. Higher is more similar.
+        firstFace:
+          $ref: '#/components/schemas/FacePosition'
+        secondFace:
+          $ref: '#/components/schemas/FacePosition'
+    Envelope:
+      type: object
+      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
+
+        business errors; `code` carries the real outcome and drives billing.
+
+        '
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
+        message:
+          type: string
+          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
+
+            not `message` — the message text may change without notice.
+
+            '
+        data:
+          description: The response content. Shape differs per operation; null on most errors.
+        extra:
+          type:
+          - string
+          - 'null'
+          description: Extra response info, typically an exception message. Usually empty.
+        transactionId:
+          type: string
+          maxLength: 64
+          description: The request id. ADVANCE.AI strongly recommends storing it.
+        pricingStrategy:
+          type: string
+          enum:
+          - FREE
+          - PAY
+          description: Whether this response is billed.
+    FacePosition:
+      type: object
+      description: Bounding box and detected gender for one face in a picture.
+      properties:
+        id:
+          type: string
+          description: An identifier for the face in the picture.
+        left:
+          type: number
+          format: float
+          description: Pixels from the left edge.
+        top:
+          type: number
+          format: float
+          description: Pixels from the top edge.
+        right:
+          type: number
+          format: float
+          description: Pixels from the right edge.
+        bottom:
+          type: number
+          format: float
+          description: Pixels from the bottom edge.
+        gender:
+          type: string
+          enum:
+          - MALE
+          - FEMALE
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: X-ACCESS-TOKEN
+      description: 'Short-lived access token from POST /openapi/auth/ticket/v1/generate-token. Valid for all
+
+        ADVANCE.AI Open APIs and reusable until it expires.
+
+        '

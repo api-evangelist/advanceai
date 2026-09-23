@@ -1,0 +1,294 @@
+openapi: 3.2.0
+info:
+  title: ADVANCE.AI Open Document Verification API
+  version: '1.0'
+  summary: eKYC building blocks — token authentication, global document verification, face comparison and liveness detection.
+  description: 'ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+
+    business unit of Advance Intelligence Group (Singapore).'
+  contact:
+    name: ADVANCE.AI
+    url: https://advance.ai/contact-us/
+  termsOfService: https://advance.ai/terms-of-service/
+  x-generated-from: documentation
+  x-authored-by: API Evangelist
+  x-modeled-from: https://doc.advance.ai/
+  x-provenance:
+    method: generated
+    generated: '2026-09-07'
+    sources:
+    - url: https://doc.advance.ai/global_document_verification.html
+      status: 200
+    - url: https://doc.advance.ai/liveness_detection.html
+      status: 200
+    - url: https://doc.advance.ai/face_recognition.html
+      status: 200
+    note: Transcribed from published documentation. Not a provider-published contract.
+servers:
+- url: https://api.advance.ai
+  description: Production host. ADVANCE.AI notes the service is deployed outside mainland China.
+security:
+- AccessToken: []
+tags:
+- name: Document Verification
+  description: Global Document Verification — SDK licensing and result query with OCR and forgery detection.
+paths:
+  /intl/openapi/face-identity/document-verification/v1/auth-license:
+    post:
+      tags:
+      - Document Verification
+      operationId: authorizeDocumentVerificationLicense
+      summary: Request a Global Document Verification SDK license
+      description: 'Step 1 of the three-step Global Document Verification flow. Returns a time-limited `license`
+
+        that the Android or iOS SDK presents when it captures the document. Step 2 is the SDK
+
+        capture, which returns an `IDVID`; step 3 is `queryDocumentVerificationResult`.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                licenseEffectiveSeconds:
+                  type: integer
+                  description: License validity in seconds. Default 600, maximum 86400.
+                  default: 600
+                  maximum: 86400
+                applicationId:
+                  type: string
+                  description: Comma-separated list of valid application identifiers.
+            examples:
+              documented:
+                value:
+                  licenseEffectiveSeconds: 600
+                  applicationId: appId1,appId2
+      responses:
+        '200':
+          description: 'Envelope response. `code` is SUCCESS (pay), ACCESS_DENIED (free) or SERVICE_DISABLED (free).
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LicenseData'
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    transactionId: 196eb0c777789e58
+                    pricingStrategy: PAY
+                    message: OK
+                    data:
+                      license: jpgEkQQFKD+EXHBmIFLOycYOMkohFVyJzhfq5M0F95pp3EDcLf8Z31e4xqyeyhNXfW......
+                      expireTimestamp: 1603164618149
+                    extra: null
+                accessDenied:
+                  value:
+                    code: ACCESS_DENIED
+                    message: Access denied
+                    transactionId: eb0c771967789e58
+                    data: null
+                    extra: null
+                    pricingStrategy: FREE
+  /intl/openapi/face-identity/document-verification/v1/query:
+    post:
+      tags:
+      - Document Verification
+      operationId: queryDocumentVerificationResult
+      summary: Query a Global Document Verification result
+      description: 'Step 3 of the Global Document Verification flow. Exchanges the `IDVID` returned by the SDK
+
+        for the captured document image, the OCR field extraction, and the ID forgery verdict.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - IDVID
+              properties:
+                IDVID:
+                  type: string
+                  description: The identifier returned by the document verification SDK.
+                resultType:
+                  type: string
+                  description: 'Preferred image encoding. IMAGE_URL returns a link valid for 24 hours;
+
+                    IMAGE_BASE64 returns the image inline.
+
+                    '
+                  enum:
+                  - IMAGE_URL
+                  - IMAGE_BASE64
+                  default: IMAGE_URL
+            examples:
+              documented:
+                value:
+                  IDVID: ba959a16-a06c-4b82-ae1f-22452b5bbcf3
+                  resultType: IMAGE_URL
+      responses:
+        '200':
+          description: 'Envelope response. `code` is SUCCESS (pay), IDVID_NOT_EXISTS (free) or PARAMETER_ERROR (free).
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/DocumentVerificationResult'
+              examples:
+                idvidNotExists:
+                  value:
+                    code: IDVID_NOT_EXISTS
+                    message: The IDVID not exists
+                    data: null
+                    extra: null
+                    transactionId: c67b620fb3607c83
+                    pricingStrategy: FREE
+                parameterError:
+                  value:
+                    code: PARAMETER_ERROR
+                    message: Parameter should not be empty
+                    data: null
+                    extra: null
+                    transactionId: 6630f8dd48d4df0d
+                    pricingStrategy: FREE
+components:
+  schemas:
+    LicenseData:
+      type: object
+      properties:
+        license:
+          type: string
+          description: Authorization code, valid within its effective period.
+        expireTimestamp:
+          type: integer
+          format: int64
+          description: Expiry as epoch milliseconds.
+    DocumentVerificationResult:
+      type: object
+      properties:
+        image:
+          type: string
+          description: The captured document image, as a 24-hour URL or a base64 string.
+        OCR:
+          $ref: '#/components/schemas/OcrFields'
+        idForgery:
+          type: object
+          description: 'Forgery verdict. `result` is "pass" (not forged) or "fail" (forged); `detail` is null on
+
+            pass. Documented fail reasons include retake/screenshot, colour photocopy or cut-off
+
+            corner, black-and-white photocopy, pasted face, and modified NIK.
+
+            '
+          properties:
+            result:
+              type: string
+              enum:
+              - pass
+              - fail
+            data:
+              type: string
+            detail:
+              type:
+              - string
+              - 'null'
+    Envelope:
+      type: object
+      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
+
+        business errors; `code` carries the real outcome and drives billing.
+
+        '
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
+        message:
+          type: string
+          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
+
+            not `message` — the message text may change without notice.
+
+            '
+        data:
+          description: The response content. Shape differs per operation; null on most errors.
+        extra:
+          type:
+          - string
+          - 'null'
+          description: Extra response info, typically an exception message. Usually empty.
+        transactionId:
+          type: string
+          maxLength: 64
+          description: The request id. ADVANCE.AI strongly recommends storing it.
+        pricingStrategy:
+          type: string
+          enum:
+          - FREE
+          - PAY
+          description: Whether this response is billed.
+    OcrFields:
+      type: object
+      description: 'Fields extracted from the identity document. The documented example is an Indonesian KTP;
+
+        the field set is document-dependent.
+
+        '
+      properties:
+        idNumber:
+          type: string
+        fullName:
+          type: string
+        fullNameLocal:
+          type: string
+        expiryDate:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        subdistrict:
+          type: string
+        fullAddress:
+          type: string
+        gender:
+          type: string
+        bloodType:
+          type: string
+        religion:
+          type: string
+        nationality:
+          type: string
+        others:
+          type: object
+          description: Document-specific additional fields, e.g. rtrw, occupation, birthPlaceBirthday, maritalStatus.
+          additionalProperties: true
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: X-ACCESS-TOKEN
+      description: 'Short-lived access token from POST /openapi/auth/ticket/v1/generate-token. Valid for all
+
+        ADVANCE.AI Open APIs and reusable until it expires.
+
+        '

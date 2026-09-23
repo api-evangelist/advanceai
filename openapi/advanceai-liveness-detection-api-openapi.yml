@@ -1,0 +1,452 @@
+openapi: 3.2.0
+info:
+  title: ADVANCE.AI Open Liveness Detection API
+  version: '1.0'
+  summary: eKYC building blocks — token authentication, global document verification, face comparison and liveness detection.
+  description: 'ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+
+    business unit of Advance Intelligence Group (Singapore).'
+  contact:
+    name: ADVANCE.AI
+    url: https://advance.ai/contact-us/
+  termsOfService: https://advance.ai/terms-of-service/
+  x-generated-from: documentation
+  x-authored-by: API Evangelist
+  x-modeled-from: https://doc.advance.ai/
+  x-provenance:
+    method: generated
+    generated: '2026-09-07'
+    sources:
+    - url: https://doc.advance.ai/global_document_verification.html
+      status: 200
+    - url: https://doc.advance.ai/liveness_detection.html
+      status: 200
+    - url: https://doc.advance.ai/face_recognition.html
+      status: 200
+    note: Transcribed from published documentation. Not a provider-published contract.
+servers:
+- url: https://api.advance.ai
+  description: Production host. ADVANCE.AI notes the service is deployed outside mainland China.
+security:
+- AccessToken: []
+tags:
+- name: Liveness Detection
+  description: Liveness session licensing, result retrieval, video evidence and PII data retention.
+paths:
+  /liveness/ext/v1/generate-signature-id:
+    post:
+      tags:
+      - Liveness Detection
+      operationId: generateLivenessSignatureId
+      summary: Generate a liveness signatureId
+      description: 'Step 1 of the six-step Liveness Detection flow. Returns a unique, single-use `signatureId`
+
+        for one liveness capture. Obtain a new one after each completed detection.
+
+        `productLevel` and `livenessType` apply only to Advanguard Liveness Detection Standard/Pro
+
+        on SDK versions above 4.0.0.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productLevel:
+                  type: string
+                  description: 'STANDARD — basic compliance, high pass rate, acceptable accuracy.
+
+                    PRO — strong compliance, enhanced accuracy.
+
+                    '
+                  enum:
+                  - STANDARD
+                  - PRO
+                livenessType:
+                  type: string
+                  description: How the user goes through the liveness capture. Defaults to DISTANT_NEAR.
+                  default: DISTANT_NEAR
+      responses:
+        '200':
+          description: Envelope response carrying the signatureId. `code` SUCCESS (free).
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        signatureId:
+                          type: string
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    message: OK
+                    data:
+                      signatureId: xxxxxxx
+                    extra: null
+                    transactionId: ac66706068e737b5
+                    pricingStrategy: FREE
+  /openapi/liveness/v1/auth-license:
+    post:
+      tags:
+      - Liveness Detection
+      operationId: authorizeLivenessLicense
+      summary: Request a Liveness Detection SDK license
+      description: 'Step 2 of the Liveness Detection flow. Returns a time-limited `license` the mobile SDK
+
+        presents when it runs the liveness capture.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                licenseEffectiveSeconds:
+                  type: integer
+                  description: License validity in seconds. Default 600, maximum 86400.
+                  default: 600
+                  maximum: 86400
+                applicationId:
+                  type: string
+                  description: Comma-separated list of valid application identifiers.
+            examples:
+              documented:
+                value:
+                  licenseEffectiveSeconds: 600
+                  applicationId: appId1,appId2
+      responses:
+        '200':
+          description: Envelope response. `code` is SUCCESS (pay), ACCESS_DENIED (free) or SERVICE_DISABLED (free).
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LicenseData'
+              examples:
+                serviceDisabled:
+                  value:
+                    code: SERVICE_DISABLED
+                    message: Service disabled
+                    transactionId: 789196eb0c777e58
+                    data: null
+                    extra: null
+                    pricingStrategy: FREE
+  /openapi/liveness/v3/detection-result:
+    post:
+      tags:
+      - Liveness Detection
+      operationId: getLivenessDetectionResult
+      summary: Retrieve a liveness detection result
+      description: 'Step 4 of the Liveness Detection flow. Exchanges the `livenessId` (from the SDK) or the
+
+        `signatureId` (from step 1) for the liveness score, the captured face image, the far/near
+
+        stage images and, when the score is zero, the attack classification. `livenessId` and
+
+        `signatureId` cannot both be empty. ADVANCE.AI''s published guidance: a score above 50 is
+
+        normal and the suggestion is pass; below 50 the suggestion is manual check.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                livenessId:
+                  type: string
+                  description: Identifier for the user's face photo, from the SDK.
+                signatureId:
+                  type: string
+                  description: The signatureId from generateLivenessSignatureId.
+                resultType:
+                  type: string
+                  enum:
+                  - IMAGE_URL
+                  - IMAGE_BASE64
+                  default: IMAGE_URL
+                  description: IMAGE_URL links expire after 24 hours.
+            examples:
+              documented:
+                value:
+                  livenessId: ddsd-9e6-dcc9-4ca1-bdfe-9f001c05f1b1
+                  resultType: IMAGE_URL
+      responses:
+        '200':
+          description: 'Envelope response. `code` is SUCCESS (pay), LIVENESS_ID_NOT_EXISTED (free),
+
+            RESULT_NOT_FOUND (free) or PARAMETER_ERROR (free).
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LivenessResult'
+              examples:
+                attackDetected:
+                  value:
+                    code: SUCCESS
+                    message: OK
+                    data:
+                      detectionResult: https://
+                      livenessScore: 0.0
+                      auditImageUrl: null
+                      imageFarUrl: https://
+                      imageNearUrl: https://
+                      nearImageTime: null
+                      farImageTime: null
+                      attackType: 3
+                      attackSubType: null
+                      sdkVersion: 3.6.2
+                      platform: iOS
+                    extra: null
+                    transactionId: 16733ebf2ca75a0b
+                    pricingStrategy: PAY
+                resultNotFound:
+                  value:
+                    code: RESULT_NOT_FOUND
+                    message: The requested resource was not found or has been deleted
+                    data: null
+                    extra: null
+                    transactionId: d5bec4f642549caf
+                    pricingStrategy: FREE
+  /liveness/ext/v1/get-video:
+    get:
+      tags:
+      - Liveness Detection
+      operationId: getLivenessVideo
+      summary: Retrieve liveness video evidence
+      description: 'Step 5 of the Liveness Detection flow. Returns a link to the recorded liveness video,
+
+        valid for 24 hours; re-query for a fresh link once it expires. Only available on SDK
+
+        versions above 4.0.0, and video recording is not enabled by default — ADVANCE.AI must
+
+        activate it for the account first. `pricingStrategy` is documented as deprecated on this
+
+        operation and always returns FREE.'
+      parameters:
+      - name: livenessId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The livenessId of the liveness detection.
+      - name: signatureId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The signatureId of the liveness detection.
+      responses:
+        '200':
+          description: 'Envelope response. `code` is SUCCESS, LIVENESS_ID_NOT_EXISTED (free),
+
+            SIGNATURE_ID_NOT_EXIST (free), VIDEO_NOT_FOUND (free), PARAMETER_ERROR (free) or ERROR.
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        videoUrl:
+                          type: string
+                          format: uri
+                          description: Link to the video. Expires after 24 hours.
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    message: OK
+                    data:
+                      videoUrl: https://xxx.xxx.xxx
+                    extra: null
+                    transactionId: ac66706068e737b5
+                    pricingStrategy: FREE
+                videoNotFound:
+                  value:
+                    code: VIDEO_NOT_FOUND
+                    message: The requested resource was not found or has been deleted
+                    data: null
+                    extra: null
+                    transactionId: a2190c8682344303
+                    pricingStrategy: FREE
+  /liveness/ext/v1/clear-data:
+    get:
+      tags:
+      - Liveness Detection
+      operationId: clearLivenessPiiData
+      summary: Delete the PII held for a liveness detection
+      description: 'Step 6 of the Liveness Detection flow — "PII Data Retention". Deletes the personally
+
+        identifiable data ADVANCE.AI holds for one liveness detection, addressed by `livenessId` or
+
+        `signatureId`. Provided for customers with compliance requirements. IRREVERSIBLE: the
+
+        documentation describes no restore, undo or recovery window for cleared data.'
+      parameters:
+      - name: livenessId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The livenessId whose data should be cleaned up.
+      - name: signatureId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The signatureId whose data should be cleaned up.
+      responses:
+        '200':
+          description: Envelope response. `code` is SUCCESS, PARAMETER_ERROR (free) or ERROR.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    message: OK
+                    data: null
+                    extra: null
+                    transactionId: ac66706068e737b5
+                    pricingStrategy: FREE
+components:
+  schemas:
+    LicenseData:
+      type: object
+      properties:
+        license:
+          type: string
+          description: Authorization code, valid within its effective period.
+        expireTimestamp:
+          type: integer
+          format: int64
+          description: Expiry as epoch milliseconds.
+    Envelope:
+      type: object
+      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
+
+        business errors; `code` carries the real outcome and drives billing.
+
+        '
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
+        message:
+          type: string
+          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
+
+            not `message` — the message text may change without notice.
+
+            '
+        data:
+          description: The response content. Shape differs per operation; null on most errors.
+        extra:
+          type:
+          - string
+          - 'null'
+          description: Extra response info, typically an exception message. Usually empty.
+        transactionId:
+          type: string
+          maxLength: 64
+          description: The request id. ADVANCE.AI strongly recommends storing it.
+        pricingStrategy:
+          type: string
+          enum:
+          - FREE
+          - PAY
+          description: Whether this response is billed.
+    LivenessResult:
+      type: object
+      properties:
+        detectionResult:
+          type: string
+          description: The face image, as a 24-hour URL or a base64 string.
+        livenessScore:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Anti-spoofing score. Below 50 may indicate an attack.
+        auditImageUrl:
+          type:
+          - string
+          - 'null'
+          description: Zip of audit images. Must be configured in the SDK, otherwise null. 24-hour link.
+        imageFarUrl:
+          type: string
+          description: Photo taken by the user in the far stage. 24-hour link.
+        farImageTime:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        imageNearUrl:
+          type: string
+          description: Photo taken by the user in the near stage. 24-hour link.
+        nearImageTime:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        attackType:
+          type:
+          - integer
+          - 'null'
+          description: Returned when livenessScore is 0. 1 presentation attack, 2 injection attack, 3 unsure attack.
+          enum:
+          - 1
+          - 2
+          - 3
+          - null
+        attackSubType:
+          type:
+          - string
+          - 'null'
+          description: Currently always null; ADVANCE.AI states more detail will follow.
+        sdkVersion:
+          type: string
+        platform:
+          type: string
+          enum:
+          - Android
+          - iOS
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: X-ACCESS-TOKEN
+      description: 'Short-lived access token from POST /openapi/auth/ticket/v1/generate-token. Valid for all
+
+        ADVANCE.AI Open APIs and reusable until it expires.
+
+        '

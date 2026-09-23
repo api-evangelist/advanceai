@@ -1,0 +1,193 @@
+openapi: 3.2.0
+info:
+  title: ADVANCE.AI Open Authentication API
+  version: '1.0'
+  summary: eKYC building blocks — token authentication, global document verification, face comparison and liveness detection.
+  description: 'ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
+
+    business unit of Advance Intelligence Group (Singapore).'
+  contact:
+    name: ADVANCE.AI
+    url: https://advance.ai/contact-us/
+  termsOfService: https://advance.ai/terms-of-service/
+  x-generated-from: documentation
+  x-authored-by: API Evangelist
+  x-modeled-from: https://doc.advance.ai/
+  x-provenance:
+    method: generated
+    generated: '2026-09-07'
+    sources:
+    - url: https://doc.advance.ai/global_document_verification.html
+      status: 200
+    - url: https://doc.advance.ai/liveness_detection.html
+      status: 200
+    - url: https://doc.advance.ai/face_recognition.html
+      status: 200
+    note: Transcribed from published documentation. Not a provider-published contract.
+servers:
+- url: https://api.advance.ai
+  description: Production host. ADVANCE.AI notes the service is deployed outside mainland China.
+security:
+- AccessToken: []
+tags:
+- name: Authentication
+  description: Exchange an access key and request signature for a short-lived access token.
+paths:
+  /openapi/auth/ticket/v1/generate-token:
+    post:
+      tags:
+      - Authentication
+      operationId: generateAccessToken
+      summary: Generate an access token
+      description: 'Exchange your `accessKey` and a request `signature` for a short-lived access token. The
+
+        signature is the SHA256 hash of `accessKey + secretKey + timestamp`. The `timestamp` inside
+
+        the signature must match the `timestamp` parameter. The returned token is passed on every
+
+        other operation in the `X-ACCESS-TOKEN` header. Access keys are found on the Websaas
+
+        Platform under Account > Account Management. Requesting a new token does not invalidate an
+
+        existing one, and one token is valid across all APIs.'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - accessKey
+              - signature
+              - timestamp
+              properties:
+                accessKey:
+                  type: string
+                  description: The account access key.
+                signature:
+                  type: string
+                  description: SHA256 of accessKey + secretKey + timestamp.
+                timestamp:
+                  type: integer
+                  format: int64
+                  description: 13-digit epoch milliseconds; suggested within 300 seconds of now.
+                periodSecond:
+                  type: integer
+                  description: Token validity in seconds. Default 3600, minimum 60, maximum 86400.
+                  default: 3600
+                  minimum: 60
+                  maximum: 86400
+            examples:
+              documented:
+                summary: Example from the ADVANCE.AI documentation
+                value:
+                  accessKey: REDACTED_EXAMPLE_ACCESS_KEY
+                  signature: REDACTED_EXAMPLE_SIGNATURE
+                  timestamp: 1648785145789
+                  periodSecond: 120
+      responses:
+        '200':
+          description: 'Envelope response. `code` carries the outcome — SUCCESS (free), PARAMETER_ERROR (free,
+
+            "Parameter should not be empty" / "Timestamp error" / "Signature error"),
+
+            ACCOUNT_DISABLED (free), CLIENT_ERROR (free).
+
+            '
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Envelope'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/TokenData'
+              examples:
+                success:
+                  value:
+                    code: SUCCESS
+                    message: OK
+                    data:
+                      token: REDACTED_EXAMPLE_JWT
+                      expiredTime: 1642580192430
+                    extra: null
+                    transactionId: 6c2c50a3049ce67e
+                    pricingStrategy: FREE
+                signatureError:
+                  value:
+                    code: PARAMETER_ERROR
+                    message: Signature error
+                    data: null
+                    extra: null
+                    transactionId: 00b05cb9cf6f0fed
+                    pricingStrategy: FREE
+                accountDisabled:
+                  value:
+                    code: ACCOUNT_DISABLED
+                    message: Account Disabled
+                    data: null
+                    extra: null
+                    transactionId: 5e00fded1272490e
+                    pricingStrategy: FREE
+components:
+  schemas:
+    Envelope:
+      type: object
+      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
+
+        business errors; `code` carries the real outcome and drives billing.
+
+        '
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
+        message:
+          type: string
+          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
+
+            not `message` — the message text may change without notice.
+
+            '
+        data:
+          description: The response content. Shape differs per operation; null on most errors.
+        extra:
+          type:
+          - string
+          - 'null'
+          description: Extra response info, typically an exception message. Usually empty.
+        transactionId:
+          type: string
+          maxLength: 64
+          description: The request id. ADVANCE.AI strongly recommends storing it.
+        pricingStrategy:
+          type: string
+          enum:
+          - FREE
+          - PAY
+          description: Whether this response is billed.
+    TokenData:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The access token, a JWT.
+        expiredTime:
+          type: integer
+          format: int64
+          description: Expiry as epoch milliseconds.
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: X-ACCESS-TOKEN
+      description: 'Short-lived access token from POST /openapi/auth/ticket/v1/generate-token. Valid for all
+
+        ADVANCE.AI Open APIs and reusable until it expires.
+
+        '

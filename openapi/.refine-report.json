@@ -1,0 +1,26 @@
+{
+  "provider": "advanceai",
+  "sources": [
+    "_original/advanceai-openapi.yml"
+  ],
+  "outputs": [
+    "advanceai-authentication-api-openapi.yml",
+    "advanceai-document-verification-api-openapi.yml",
+    "advanceai-face-comparison-api-openapi.yml",
+    "advanceai-liveness-detection-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "advanceai-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "advanceai-authentication-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "advanceai-document-verification-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "advanceai-face-comparison-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "advanceai-liveness-detection-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}
