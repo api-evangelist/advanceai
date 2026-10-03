@@ -177,44 +177,6 @@ components:
           type: integer
           format: int64
           description: Expiry as epoch milliseconds.
-    OcrFields:
-      type: object
-      description: 'Fields extracted from the identity document. The documented example is an Indonesian KTP;
-
-        the field set is document-dependent.
-
-        '
-      properties:
-        idNumber:
-          type: string
-        fullName:
-          type: string
-        fullNameLocal:
-          type: string
-        expiryDate:
-          type: string
-        state:
-          type: string
-        city:
-          type: string
-        district:
-          type: string
-        subdistrict:
-          type: string
-        fullAddress:
-          type: string
-        gender:
-          type: string
-        bloodType:
-          type: string
-        religion:
-          type: string
-        nationality:
-          type: string
-        others:
-          type: object
-          description: Document-specific additional fields, e.g. rtrw, occupation, birthPlaceBirthday, maritalStatus.
-          additionalProperties: true
     Envelope:
       type: object
       description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
@@ -253,6 +215,44 @@ components:
           - FREE
           - PAY
           description: Whether this response is billed.
+    OcrFields:
+      type: object
+      description: 'Fields extracted from the identity document. The documented example is an Indonesian KTP;
+
+        the field set is document-dependent.
+
+        '
+      properties:
+        idNumber:
+          type: string
+        fullName:
+          type: string
+        fullNameLocal:
+          type: string
+        expiryDate:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        subdistrict:
+          type: string
+        fullAddress:
+          type: string
+        gender:
+          type: string
+        bloodType:
+          type: string
+        religion:
+          type: string
+        nationality:
+          type: string
+        others:
+          type: object
+          description: Document-specific additional fields, e.g. rtrw, occupation, birthPlaceBirthday, maritalStatus.
+          additionalProperties: true
     DocumentVerificationResult:
       type: object
       properties:

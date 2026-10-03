@@ -160,19 +160,6 @@ components:
           - FREE
           - PAY
           description: Whether this response is billed.
-    FaceComparisonResult:
-      type: object
-      properties:
-        similarity:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: Similarity between the two faces. Higher is more similar.
-        firstFace:
-          $ref: '#/components/schemas/FacePosition'
-        secondFace:
-          $ref: '#/components/schemas/FacePosition'
     FacePosition:
       type: object
       description: Bounding box and detected gender for one face in a picture.
@@ -201,6 +188,19 @@ components:
           enum:
           - MALE
           - FEMALE
+    FaceComparisonResult:
+      type: object
+      properties:
+        similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Similarity between the two faces. Higher is more similar.
+        firstFace:
+          $ref: '#/components/schemas/FacePosition'
+        secondFace:
+          $ref: '#/components/schemas/FacePosition'
   securitySchemes:
     AccessToken:
       type: apiKey
