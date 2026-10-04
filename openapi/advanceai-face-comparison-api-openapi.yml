@@ -122,6 +122,19 @@ paths:
                     pricingStrategy: PAY
 components:
   schemas:
+    FaceComparisonResult:
+      type: object
+      properties:
+        similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Similarity between the two faces. Higher is more similar.
+        firstFace:
+          $ref: '#/components/schemas/FacePosition'
+        secondFace:
+          $ref: '#/components/schemas/FacePosition'
     Envelope:
       type: object
       description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
@@ -188,19 +201,6 @@ components:
           enum:
           - MALE
           - FEMALE
-    FaceComparisonResult:
-      type: object
-      properties:
-        similarity:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: Similarity between the two faces. Higher is more similar.
-        firstFace:
-          $ref: '#/components/schemas/FacePosition'
-        secondFace:
-          $ref: '#/components/schemas/FacePosition'
   securitySchemes:
     AccessToken:
       type: apiKey

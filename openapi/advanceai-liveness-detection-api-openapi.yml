@@ -337,54 +337,6 @@ paths:
                     pricingStrategy: FREE
 components:
   schemas:
-    LicenseData:
-      type: object
-      properties:
-        license:
-          type: string
-          description: Authorization code, valid within its effective period.
-        expireTimestamp:
-          type: integer
-          format: int64
-          description: Expiry as epoch milliseconds.
-    Envelope:
-      type: object
-      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
-
-        business errors; `code` carries the real outcome and drives billing.
-
-        '
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: string
-          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
-        message:
-          type: string
-          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
-
-            not `message` — the message text may change without notice.
-
-            '
-        data:
-          description: The response content. Shape differs per operation; null on most errors.
-        extra:
-          type:
-          - string
-          - 'null'
-          description: Extra response info, typically an exception message. Usually empty.
-        transactionId:
-          type: string
-          maxLength: 64
-          description: The request id. ADVANCE.AI strongly recommends storing it.
-        pricingStrategy:
-          type: string
-          enum:
-          - FREE
-          - PAY
-          description: Whether this response is billed.
     LivenessResult:
       type: object
       properties:
@@ -440,6 +392,54 @@ components:
           enum:
           - Android
           - iOS
+    LicenseData:
+      type: object
+      properties:
+        license:
+          type: string
+          description: Authorization code, valid within its effective period.
+        expireTimestamp:
+          type: integer
+          format: int64
+          description: Expiry as epoch milliseconds.
+    Envelope:
+      type: object
+      description: 'The common ADVANCE.AI response envelope. The HTTP status is 200 for both success and
+
+        business errors; `code` carries the real outcome and drives billing.
+
+        '
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The ADVANCE.AI status code. See the Glossary for the shared codes.
+        message:
+          type: string
+          description: 'Human-readable explanation of the status code. ADVANCE.AI advises branching on `code`,
+
+            not `message` — the message text may change without notice.
+
+            '
+        data:
+          description: The response content. Shape differs per operation; null on most errors.
+        extra:
+          type:
+          - string
+          - 'null'
+          description: Extra response info, typically an exception message. Usually empty.
+        transactionId:
+          type: string
+          maxLength: 64
+          description: The request id. ADVANCE.AI strongly recommends storing it.
+        pricingStrategy:
+          type: string
+          enum:
+          - FREE
+          - PAY
+          description: Whether this response is billed.
   securitySchemes:
     AccessToken:
       type: apiKey
