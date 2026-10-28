@@ -1,4 +1,4 @@
-# Advanceai
+# ADVANCE.AI
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,81 +64,128 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-# ADVANCE.AI
+ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management business unit of Advance Intelligence Group, headquartered in Singapore and founded in 2016. Its AdvanGuard product line covers identity verification, document verification, face authentication and Know Your Business checks for banking and financial services, fintech, crypto, payments, e-commerce and the sharing economy, with a strong footprint across Southeast Asia and other emerging markets. ADVANCE.AI publishes a public Open API at api.advance.ai documented at doc.advance.ai — token authentication, Global Document Verification with OCR field extraction and ID forgery detection, face comparison, and liveness detection with video evidence and PII data retention — plus first-party Android and iOS capture SDKs distributed from its own Maven and object-storage endpoints. Onboarding is sales-led: there is no self-service sign-up and no published pricing, and platform access keys are issued through the Websaas platform.
 
-ADVANCE.AI is the digital identity verification, KYC/KYB, AML, compliance and risk-management
-business unit of **Advance Intelligence Group**, headquartered in Singapore and founded in 2016.
-Its AdvanGuard product line covers identity verification, document verification, face
-authentication and Know Your Business checks for banking and financial services, fintech, crypto,
-payments, e-commerce and the sharing economy, with a strong footprint across Southeast Asia and
-other emerging markets.
+**Areas:** Company · Identity Verification · KYC · KYB · AML · Fraud Prevention · Face Recognition · Liveness Detection · OCR · Document Verification · Risk Management · Artificial Intelligence
 
-- Website — https://advance.ai/
-- API documentation — https://doc.advance.ai/
-- API host — https://api.advance.ai
-- Status — https://status.advance.ai/
-- Request access — https://advance.ai/book-free-demo/
+## ADVANCE.AI on APIs.io
 
-## What ADVANCE.AI publishes
+Everything profiled for ADVANCE.AI is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/advanceai/](https://apis.io/providers/advanceai/)** — or go straight to one of the APIs or properties below.
 
-A public **Open API** with nine documented operations across four services: token authentication,
-Global Document Verification (SDK licensing, OCR field extraction, ID forgery detection), face
-comparison, and liveness detection (signature, licensing, result, video evidence, and programmatic
-PII deletion). Plus first-party Android and iOS capture SDKs distributed from ADVANCE.AI's own
-Nexus Maven repository and object storage.
+### APIs (4)
 
-Two properties of this API matter more than anything else in it:
+- [ADVANCE.AI Authentication API](https://apis.io/apis/advanceai/advanceai-authentication-api/) — Exchange an access key and request signature for a short-lived access token.
+- [ADVANCE.AI Document Verification API](https://apis.io/apis/advanceai/advanceai-document-verification-api/) — Global Document Verification — SDK licensing and result query with OCR and forgery detection.
+- [ADVANCE.AI Face Comparison API](https://apis.io/apis/advanceai/advanceai-face-comparison-api/) — Compare two face photographs and return a similarity score.
+- [ADVANCE.AI Liveness Detection API](https://apis.io/apis/advanceai/advanceai-liveness-detection-api/) — Liveness session licensing, result retrieval, video evidence and PII data retention.
 
-1. **Every response is HTTP 200.** Success, authentication failure, quota exhaustion and server
-   error all return 200, and the real outcome lives in the JSON envelope field `code`. A client
-   that branches on HTTP status reads every failure as a success.
-2. **Billing is per response code, and four failure codes are chargeable.** Each documented status
-   code carries a `free` or `pay` tag. On face comparison, "no face detected" and "face quality too
-   low" both bill — so a blind retry loop on a bad image costs money every attempt.
+### Published properties
 
-## Not published by ADVANCE.AI
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-Recorded here so an absence reads as measured rather than missing. Each was probed on 2026-09-07.
+#### MCP servers (1)
 
-- **No OpenAPI or Swagger.** `/openapi.json`, `/openapi.yaml`, `/swagger.json`, `/v1/openapi.json`,
-  `/api-docs`, `/docs` and `/redoc` all return 404 on `api.advance.ai` and on `doc.advance.ai`.
-  The specification in `openapi/` was **authored by API Evangelist from the published
-  documentation** and is marked as such in its own provenance block. It is not a provider artifact.
-- **No `/.well-known/` document of any kind** on any host — see `well-known/` for the full probe
-  table, including a soft-200 catch-all on `app.advance.ai` that answers every path with an error
-  envelope and would otherwise register as six false positives.
-- **No A2A agent card**, **no MCP server**, **no GraphQL, gRPC, WSDL or AsyncAPI surface**, and
-  **no webhooks or events**.
-- **No server-side client library** on npm, PyPI, Maven Central, NuGet, RubyGems, Packagist,
-  crates.io or pkg.go.dev, and no ADVANCE.AI GitHub organization.
-- **No published pricing and no self-service sign-up.** The site has no pricing page; access is
-  sales-led through a demo request.
-- **No idempotency mechanism, no reversal operation, no sandbox and no dated API changelog.**
+Model Context Protocol servers that expose the API to agents.
 
-## Notable findings
+- [advanceai-mcp.yml](https://apis.io/servers/advanceai/advanceai-mcp-yml/)
 
-- **`clearLivenessPiiData` is irreversible.** ADVANCE.AI offers a programmatic PII erasure endpoint
-  — an uncommon and genuinely useful privacy affordance — but documents no restore, no soft delete
-  and no recovery window. Recorded in `conventions/` and gated behind human confirmation in the
-  skills.
-- **The published reference is a subset of the running surface.** The status page lists a
-  production component named `curp-info-check` (CURP is the Mexican national identity number) that
-  has no page in the public API reference.
-- **Certifications are badge images, not text.** BSI, iBeta Level 1 and iBeta Level 2 certificate
-  images are displayed on the Security & Compliance page with no certificate number, scope or
-  expiry in machine-readable form. This profile records that the badges are displayed and does not
-  assert what they cover. ISO 27001, PCI DSS and HIPAA appear on that page only as generic examples
-  of regulatory standards and are **not** credited as certifications ADVANCE.AI holds.
-- **A security contact exists but is not discoverable by machine.** `security@advance.ai` is
-  published in HTML prose; `/.well-known/security.txt` returns 404 everywhere. Serving RFC 9116
-  would make an existing commitment machine-readable at near-zero cost.
-- **The iOS SDK distribution is unpinned** — the download URL contains the literal path segment
-  `latest` and carries no version, so a consumer cannot tell which build they received.
+#### Agentic access (1)
 
-## Related records in this network
+Which operations an agent can call, which act, and which need a human in the loop.
 
-ADVANCE.AI is one business unit of Advance Intelligence Group, which also operates Atome Financial
-and Ginee. The parent company is profiled separately at `all/advance-intelligence-group/`, and that
-record was itself enriched from this same `doc.advance.ai` surface. A third stub exists at
-`all/advance.ai/`. **These records overlap and should be reconciled by a human** — see
-`x-parent-company` and `x-duplicate-candidates` in `apis.yml`.
+- [Advanceai Agentic Access](https://apis.io/agentic-access/advanceai/advanceai-agentic-access/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Advanceai Open Api Overlay](https://apis.io/overlays/advanceai/advanceai-open-api-overlay/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Advanceai Authentication](https://apis.io/security/advanceai/advanceai-authentication/)
+- [Advanceai Domain Security](https://apis.io/security/advanceai/advanceai-domain-security/)
+- [Advanceai Trust Center](https://apis.io/security/advanceai/advanceai-trust-center/)
+- [Advanceai Vulnerability Disclosure](https://apis.io/security/advanceai/advanceai-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Advanceai Plans Pricing](https://apis.io/plans/advanceai/advanceai-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Advanceai Rate Limits](https://apis.io/rate-limits/advanceai/advanceai-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://advance.ai/)
+- [Documentation](https://doc.advance.ai/global_document_verification.html)
+- [API reference](https://doc.advance.ai/liveness_detection.html)
+- [Sign up](https://advance.ai/book-free-demo/)
+- [Support](https://support.advance.ai/hc/en-us)
+- [Blog](https://advance.ai/blog/)
+- [Compliance](https://advance.ai/security-compliance/)
+- [Terms of service](https://advance.ai/terms-of-service/)
+- [Privacy policy](https://advance.ai/privacy-policy/)
+- [Status](https://status.advance.ai/)
+
+## API Evangelist rating
+
+**Kin Score 34.9** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 14.3 |
+| Contract governance | 0.0 |
+| Operational transparency | 34.2 |
+| Developer ergonomics | 44.6 |
+| Access clarity | 50.0 |
+
+**Agent readiness 31.5** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 31.6** — AI & Biometrics
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/advanceai/](https://apis.io/providers/advanceai/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for ADVANCE.AI: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/advanceai/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
