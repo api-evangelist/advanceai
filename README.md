@@ -93,34 +93,41 @@ Model Context Protocol servers that expose the API to agents.
 
 Which operations an agent can call, which act, and which need a human in the loop.
 
-- [Advanceai Agentic Access](https://apis.io/agentic-access/advanceai/advanceai-agentic-access/)
+- [ADVANCE.AI Agentic Access](https://apis.io/agentic-access/advanceai/advanceai-agentic-access/)
 
-#### Overlays (1)
+#### Overlays (2)
 
 OpenAPI overlays, including conversational phrasing for each operation.
 
-- [Advanceai Open Api Overlay](https://apis.io/overlays/advanceai/advanceai-open-api-overlay/)
+- [ADVANCE.AI Liveness Detection Api Certification Overlay](https://apis.io/overlays/advanceai/advanceai-liveness-detection-api-certification-overlay/)
+- [ADVANCE.AI Open Api Overlay](https://apis.io/overlays/advanceai/advanceai-open-api-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [ADVANCE.AI API Rules](https://apis.io/rules/advanceai/advanceai-rules/)
 
 #### Security (4)
 
 Authentication, trust centre, and vulnerability disclosure.
 
-- [Advanceai Authentication](https://apis.io/security/advanceai/advanceai-authentication/)
-- [Advanceai Domain Security](https://apis.io/security/advanceai/advanceai-domain-security/)
-- [Advanceai Trust Center](https://apis.io/security/advanceai/advanceai-trust-center/)
-- [Advanceai Vulnerability Disclosure](https://apis.io/security/advanceai/advanceai-vulnerability-disclosure/)
+- [ADVANCE.AI Authentication](https://apis.io/security/advanceai/advanceai-authentication/)
+- [ADVANCE.AI Domain Security](https://apis.io/security/advanceai/advanceai-domain-security/)
+- [ADVANCE.AI Trust Center](https://apis.io/security/advanceai/advanceai-trust-center/)
+- [ADVANCE.AI Vulnerability Disclosure](https://apis.io/security/advanceai/advanceai-vulnerability-disclosure/)
 
 #### Plans and pricing (1)
 
 Published plans, tiers and prices.
 
-- [Advanceai Plans Pricing](https://apis.io/plans/advanceai/advanceai-plans-pricing/)
+- [ADVANCE.AI Plans Pricing](https://apis.io/plans/advanceai/advanceai-plans-pricing/)
 
 #### Rate limits (1)
 
 Published request limits.
 
-- [Advanceai Rate Limits](https://apis.io/rate-limits/advanceai/advanceai-rate-limits/)
+- [ADVANCE.AI Rate Limits](https://apis.io/rate-limits/advanceai/advanceai-rate-limits/)
 
 ## Where to find this API
 
@@ -139,18 +146,18 @@ Links to the company's own pages. This repository publishes no copy of their spe
 
 ## API Evangelist rating
 
-**Kin Score 34.9** — thin · rubric 0.24.0 · scored 2026-10-17
+**Kin Score 36.3** — thin · rubric 0.28.1 · scored 2026-11-21
 
 | Facet | Score |
 |---|---|
 | Discoverability | 66.1 |
 | Contract quality | 14.3 |
-| Contract governance | 0.0 |
-| Operational transparency | 34.2 |
+| Contract governance | 13.6 |
+| Operational transparency | 31.0 |
 | Developer ergonomics | 44.6 |
-| Access clarity | 50.0 |
+| Access clarity | 51.1 |
 
-**Agent readiness 31.5** — agent-ready
+**Agent readiness 32.2** — agent-ready
 
 | Agent-readiness dimension | Result |
 |---|---|
@@ -173,6 +180,12 @@ Links to the company's own pages. This repository publishes no copy of their spe
 | Protected Resource Metadata | — |
 | Dynamic Client Registration | — |
 | Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+| MCP Tool Quality | na |
+| Onboarding Descriptor | — |
+| Dns Aid Index | na |
+| Markdown Negotiation | na |
 
 **Regulatory alignment 31.6** — AI & Biometrics
 
